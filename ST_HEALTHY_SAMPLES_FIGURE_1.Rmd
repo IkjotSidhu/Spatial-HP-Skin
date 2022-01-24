@@ -1,0 +1,573 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+## Working exclusively on healthy samples for Fiugure 1, Supplementary figure 1 and 2.
+
+## LOAD ALL PACKAGES
+```{r}
+library(tidyverse)
+library(Seurat)
+library(cowplot)
+```
+
+
+```{r}
+## HEALTHY SAMPLES
+## HEALTHY MALE SKIN 1 & 2
+HEALTHY.Male.s1 <- Load10X_Spatial(data.dir ="../FOURTH_RUN/SAMPLE A1/",slice="HealthyMale-1-S1")
+HEALTHY.Male.s2 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HM-1/",slice="HealthyMale-1-S2")
+
+## HEALTHY FEMALE SKIN 1 & 2 (FROM THE SAME DONOR)
+HEALTHY.Female1.s1 <- Load10X_Spatial(data.dir ="../FOURTH_RUN/SAMPLE B1/",slice="HealthyFemale-1-S1")
+HEALTHY.Female1.s2 <- Load10X_Spatial(data.dir ="../FIFTH_RUN/SAMPLE D1/",slice="HealthyFemale-1-S2")
+HEALTHY.Female1.s3 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-1/",slice="HealthyFemale-1-S3")
+
+## HEALTHY FEMALE
+HEALTHY.Female2.s1 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-2E/",slice="HealthyFemale-2-S1")
+HEALTHY.Female2.s2 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-2F/",slice="HealthyFemale-2-S2")
+
+```
+### Import the spots to be removed from loupe browser.
+```{r}
+# HEALTHY FEMALE SKIN 2
+#REMOVE SPOTS
+
+remove.spots <- read.csv(file="../CLOUPE_FILES/FIFTH_RUN/D1/OUTLIERS.csv")
+subset_spots <- Cells(HEALTHY.Female1.s2)[which((!(rownames(HEALTHY.Female1.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female1.s2.clean <- subset(HEALTHY.Female1.s2,cells=subset_spots)
+```
+
+```{r}
+HEALTHY.Male.s1$orig.ident <- "Healthy Volunteer 1 - Sun-protected R1" 
+HEALTHY.Male.s2$orig.ident <- "Healthy Volunteer 1 - Sun-protected R2"
+
+HEALTHY.Female1.s1$orig.ident <- "Healthy Volunteer 2 - Sun-exposed R1"
+HEALTHY.Female1.s2.clean$orig.ident <- "Healthy Volunteer 2 - Sun-exposed R2"
+HEALTHY.Female1.s3$orig.ident <- "Healthy Volunteer 2 - Sun-protected"
+
+HEALTHY.Female2.s1$orig.ident <- "Healthy Volunteer 3 - Sun-exposed"
+HEALTHY.Female2.s2$orig.ident <- "Healthy Volunteer 3 - Sun-protected"
+```
+
+```{r}
+Healthy_Samples <- c(HEALTHY.Male.s1,HEALTHY.Male.s2,HEALTHY.Female1.s1,HEALTHY.Female1.s2.clean,HEALTHY.Female1.s3,HEALTHY.Female2.s1,HEALTHY.Female2.s2)
+```
+
+```{r}
+spatial_images<- c("HealthyMale.1.S1","HealthyMale.1.S2","HealthyFemale.1.S1","HealthyFemale.1.S2","HealthyFemale.1.S3","HealthyFemale.2.S1","HealthyFemale.2.S2")
+```
+```{r}
+for (x in Healthy_Samples){
+  st_plot(x)
+}
+```
+
+```{r}
+for (x in Healthy_Samples){
+  st_plot_QC(x)
+}
+```
+
+```{r}
+for (x in Healthy_Samples){
+  st_scatter_QC(x)
+}
+```
+
+```{r}
+i <- 1
+while(i <= length(Healthy_Samples)){
+  filtered_data <- st_filter_by_genes(st.data = Healthy_Samples[[i]],x = 200)
+  Healthy_Samples[[i]] <- filtered_data
+  i <- i+1
+}
+```
+
+```{r}
+new.skin.combined <- st_combine(Healthy_Samples,ndim = 20,res = 0.6)
+```
+
+```{r}
+ElbowPlot(new.skin.combined,ndims = 50)
+```
+```{r}
+DimPlot(new.skin.combined,split.by = "orig.ident")
+```
+```{r}
+DimPlot(new.skin.combined,label = TRUE,label.size = 7,pt.size = 2.5)
+DimPlot(new.skin.combined,cols = custom_colors,pt.size = 2.5)
+```
+
+## ADD A HYPERLINK TO LINK FIGURE AND CODE
+```{r}
+Idents(new.skin.combined) <- "seurat_clusters"
+pdf(width = 7,height=5,file = "UMAP_HEALTHY_SAMPLES_CLUSTERS_ONLY.pdf")
+DimPlot(new.skin.combined,cols = custom_colors_1,pt.size = 4)
+dev.off()
+Idents(new.skin.combined) <- "Spatial.regions"
+```
+
+```{r}
+pdf(width = 8,height=10,file = "HEALTHY_FEMALE_SAMPLE_1_R2_SPATIAL_PLOT.pdf")
+SpatialDimPlot(new.skin.combined,images="HealthyFemale.1.S2",cols = custom_colors_1,pt.size.factor = 2.4)
+dev.off()
+```
+```{r}
+## SAVE THE RESULTS
+save(new.skin.combined,file = "HEALTHY_SKIN_SAMPLES_ST.RData")
+```
+
+```{r}
+new.skin.combined.markers <- FindAllMarkers(new.skin.combined, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT")
+DefaultAssay(new.skin.combined) <- "SCT"
+top10 <- new.skin.combined.markers %>%
+    group_by(cluster) %>%
+    filter(p_val_adj<0.05) %>%
+    top_n(n = 10, wt = avg_log2FC) %>%
+    filter(gene %in% VariableFeatures(new.skin.combined_V2))
+pdf(width = 20,height=15,file = "HEATMAP_HEALTHY_SAMPLES_CLUSTERS_ONLY.pdf")
+print(DoHeatmap(new.skin.combined, features = top10$gene,assay = "SCT",group.colors = custom_colors_1) + NoLegend())
+dev.off()
+```
+## TRYING NEW COLOR SCHEMES
+```{r}
+library("ggsci")
+library("ggplot2")
+library("gridExtra")
+```
+```{r}
+SpatialColors <- colorRampPalette(colors = rev(x = brewer.pal(n = 11, name = "Spectral")))
+cols <- SpatialColors(n = 100)
+```
+```{r}
+mypal <- pal_igv("default", alpha = 1)(13)
+
+mysimpsons <-  pal_simpsons("springfield", alpha = 1)(13)
+myucscgb <-  pal_ucscgb("default", alpha = 1)(13)
+```
+```{r}
+mylancet <-  pal_lancet("lanonc", alpha = 1)(13)
+```
+```{r}
+## IGV COLOR SCHEME
+DimPlot(new.skin.combined,cols=mypal,pt.size = 2)
+
+DimPlot(new.skin.combined,cols=mysimpsons,pt.size = 2)
+
+DimPlot(new.skin.combined,cols=myucscgb,pt.size = 2)
+```
+```{r}
+DimPlot(new.skin.combined)
+```
+```{r}
+new.skin.combined_V2 <- st_combine(Healthy_Samples,ndim = 20,res = 0.6)
+```
+
+```{r}
+pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_CLUSTERS_ONLY.pdf")
+DimPlot(new.skin.combined_V2,cols = custom_colors,pt.size = 3.5)
+dev.off()
+```
+
+```{r}
+hnf_data_counts <- as.data.frame(table(healthy_skin.sc_data@meta.data$final_clustering))
+write.csv(hnf_data_counts,file="HEALTHY_SAMPLES_HANNIFA_DATA_COUNTS.csv")
+```
+
+```{r}
+spatial_images <- c(new.skin.combined@images)
+```
+
+
+```{r}
+new.skin.combined.markers_V2 <- FindAllMarkers(new.skin.combined_V2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT")
+
+top12 <- new.skin.combined.markers_V2 %>%
+    group_by(cluster) %>%
+    filter(p_val_adj<0.05) %>%
+    top_n(n = 12, wt = avg_log2FC) %>%
+    filter(gene %in% VariableFeatures(new.skin.combined_V2))
+DoHeatmap(new.skin.combined_V2, features = top12$gene,assay = "SCT") + NoLegend()
+```
+```{r}
+DimPlot(new.skin.combined_V2,cols=myucscgb,pt.size = 2)
+```
+```{r}
+SpatialDimPlot(new.skin.combined_V2,images = "HealthyFemale.1.S2",pt.size.factor = 2.3,cols = custom_colors)
+```
+```{r}
+library("scales")
+```
+
+```{r}
+show_col(mypal)
+show_col(mysimpsons)
+show_col(myucscgb)
+```
+```{r}
+custom_colors <- c("#FFCCCCFF","#FF9900FF","#D2AF81FF","forestgreen","deeppink","mediumorchid1","#99991EFF","#999999FF","#6699FFFF","firebrick4","darkslategray1","#CCFF00FF")
+```
+```{r}
+custom_colors_1 <- c("#B4DFFC","#6EAB3D","#FFD700","#A020F0","#FFA500","#AEDD3C","#595959","#D2AF81FF","#3A49FC","#FF0000","#A86F3D","#A18FAA")
+```
+
+```{r}
+show_col(custom_colors)
+show_col(custom_colors_1)
+```
+```{r}
+SpatialDimPlot(new.skin.combined,images="HealthyFemale.1.S2",cols = custom_colors_1,pt.size.factor = 2.4)
+```
+
+
+```{r}
+pdf(width = 8,height=10,file = "HEALTHY_FEMALE_SAMPLE_1_R2_SPATIAL_PLOT.pdf")
+SpatialDimPlot(new.skin.combined,images="HealthyFemale.1.S2",cols = custom_colors_1,pt.size.factor = 2.4)
+dev.off()
+```
+```{r}
+images <- c("HealthyMale.1.S1","HealthyMale.1.S2","HealthyFemale.1.S1","HealthyFemale.1.S2","HealthyFemale.1.S3","HealthyFemale.2.S1","HealthyFemale.2.S2")
+for(x in images){
+  pdf(width = 8,height=10,file = paste(x,"_SPATIAL_PLOT.pdf"))
+  print(SpatialDimPlot(new.skin.combined,images=x,cols = custom_colors_1,pt.size.factor = 2))
+  dev.off()
+}
+```
+```{r}
+SpatialDimPlot(new.skin.combined,images="HealthyFemale.1.S3",cols = custom_colors_1,pt.size.factor = 2.4) 
+```
+
+```{r}
+single_cell.markers <- FindAllMarkers(NM_skin_scRNA,assay = "RNA",logfc.threshold = 0.25)
+```
+```{r}
+filtered_single_cell.markers <- single_cell.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
+filtered_spatial_markers <- new.skin.combined.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
+```
+```{r}
+##INTERSECT GENES BETWEEN scRNA and Spatial data
+st.genes <- unique(rownames(new.skin.combined@assays$Spatial@counts))
+sc.genes <- unique(rownames(NM_skin_scRNA@assays$RNA@counts))
+all.genes.scrna_and_spt <- unique(intersect(sc.genes,st.genes))
+```
+
+```{r}
+library(RColorBrewer)
+library(pheatmap)
+col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
+```
+
+## MIA - Travis paper
+```{r}
+MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = filtered_single_cell.markers,spatial.markers = filtered_spatial_markers)
+
+E.data <- MIA_results %>% column_to_rownames("cluster")
+E.data <- E.data[,order(colnames(E.data))]
+pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
+```
+
+## ADD HYPERLINK
+```{r}
+immune_only.E.data <- E.data[,c("T cell-1","T cell-2","T cell-3","Myeloid-1","Langerhans","Mast-1","Mast-2")]
+pdf(file = "MIA_regions_IMMUNE_CELLS.pdf",width = 10,height = 4)
+pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
+dev.off()
+```
+```{r}
+structure_only.E_data <- E.data[,c("Fibroblast-1","Fibroblast-2","Fibroblast-4","Fibroblast-5","HairFollicle","Keratinocyte-2","Keratinocyte-3","Keratinocyte-5","Keratinocyte-6","Keratinocyte-8","Sebocyte","Venule-1","Venule-2","Venule-3","Venule-4","VSMC-1")]
+pdf(file = "MIA_regions_STRUCTURAL_CELLS.pdf",width = 10,height = 4)
+pheatmap(structure_only.E_data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
+dev.off()
+```
+
+## NOW CALCULATING ENRICHMENT USING NEW DATASET
+```{r,eval=FALSE}
+# RUN THIS ON BIG PURPLE 
+skin_reference.2 <- SCTransform(travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
+    RunUMAP(dims = 1:40)
+anchors <- FindTransferAnchors(reference = skin_reference.2, query = new.skin.combined, normalization.method = "SCT")
+predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference.2$Specific_CellType, prediction.assay = TRUE, 
+    weight.reduction = new.skin.combined[["pca"]],dims = 1:40)
+new.skin.combined[["predictions_travis_data"]] <- predictions.assay
+```
+
+
+## CELL TYPES FOR FIGURE 1
+```{r}
+Cell_types <- c("Fibroblast-1","HairFollicle","Keratinocyte-5","Keratinocyte-3","Sebocyte","VSMC-1","Melanocyte")
+DefaultAssay(new.skin.combined) <- "predictions_travis_data"
+for (x in Cell_types){
+  pdf(file = paste("HEALTHY_FEMALE_1_R2_CELL_TYPE_",x,".pdf"),width = 10,height = 15)
+  print(SpatialFeaturePlot(new.skin.combined, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE,images = "HealthyFemale.1.S2") + scale_fill_gradientn(colors=cols,limits = c(0,1))) 
+  dev.off()
+}
+```
+```{r}
+new.cluster.ids <- c("0 Mixed","1 Dermis",
+"2 Dermis adipose","3 Epidermis","4 Hypodermis","5 Perifollicular dermis","6 Epidermis","7 Dermis","8 Dermis smooth muscle","9 Hair follicle","10 Dermis vasculature 1","11 Dermis vasculature 2")
+names(new.cluster.ids) <- levels(new.skin.combined)
+new.skin.combined <- RenameIdents(new.skin.combined, new.cluster.ids)
+new.skin.combined <- StashIdent(new.skin.combined, save.name = "Spatial.regions")
+```
+
+```{r}
+DimPlot(new.skin.combined)
+```
+## scRNA data from Travis paper
+```{r}
+Idents(travis_NM_skin_scRNA) <- "Specific_CellType"
+DimPlot(travis_NM_skin_scRNA,pt.size = 2.5,label = TRUE)
+
+Idents(travis_NM_skin_scRNA) <- "CellType"
+DimPlot(travis_NM_skin_scRNA,pt.size = 2.5)
+```
+
+## PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS
+```{r}
+Regions.df <- table(new.skin.combined@meta.data$Spatial.regions,new.skin.combined@meta.data$orig.ident) %>% as.data.frame() %>%
+  dplyr::rename(Spatial_Region=Var1,Sample=Var2) 
+
+black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+pdf(file="PERCENTAGE_COMPOSTION_PLOT_HEALTHY_SAMPLES.pdf",height = 14,width = 8)
+ggplot(Regions.df,aes(x=Sample,y=Freq,fill=Spatial_Region)) + geom_bar(stat="identity",position="fill") + scale_fill_manual(values =custom_colors_1)  + ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks)) + ylab("% Composition of Sample by Spatial Region / Clusters")
+dev.off()
+```
+## LOAD DATA FROM HANNIFA PAPER
+```{r}
+load("../scRNA_DATA/HEALTHY_SC_RNA_PROCESSED.RData")
+```
+
+```{r}
+DimPlot(healthy_skin.sc_data,raster = FALSE)
+```
+
+```{r}
+Idents(healthy_skin.sc_data) <- "final_clustering"
+hnf_skin_scRNA.markers <- FindAllMarkers(healthy_skin.sc_data,assay = "RNA",logfc.threshold = 0.25,max.cells.per.ident=400,only.pos = TRUE)
+```
+```{r}
+cell.counts <- as.data.frame(table(travis_NM_skin_scRNA@meta.data$Specific_CellType))
+write.csv(cell.counts,file="CELL_COUNTS_TRAVIS_HEALTHY_SKIN_DATA.csv")
+```
+
+```{r}
+filtered_cell.counts <- cell.counts %>% filter(Freq>50) 
+travis_healthy_data.subset <- subset(x = travis_NM_skin_scRNA, idents = filtered_cell.counts$Var1 )
+
+DimPlot(travis_healthy_data.subset,pt.size = 2.5)
+```
+```{r}
+pdf(width = 12,height=8,file = "UMAP_TRAVIS_DATA_HEALTHY_SAMPLES_ONLY.pdf")
+DimPlot(travis_healthy_data.subset,pt.size = 3.5)
+dev.off()
+```
+## PATHWAY ANALYSIS FOR SPATIAL DATA
+```{r}
+for(i in seq(0,11)){
+  cluster <- new.skin.combined.markers %>% filter(cluster==i)
+  #GO_PATHWAYS_ENRICH(cluster,ONT="BP",OUTPUT = i)
+  #GO_PATHWAYS_ENRICH(cluster,ONT="CC",OUTPUT = i)
+  #GO_PATHWAYS_ENRICH(cluster,ONT="MF",OUTPUT = i)
+  KEGG_PATHWAYS(cluster,OUTPUT = i)
+}
+```
+
+```{r}
+cluster.5 <- filtered_spatial_markers %>% filter(cluster==5)
+Myeloid.1 <- filtered_single_cell.markers %>% filter(cluster=="Myeloid-1")
+
+length(intersect(cluster.5$gene,Myeloid.1$gene))
+
+cluster.6 <- filtered_spatial_markers %>% filter(cluster==6)
+Keratinocyte.5 <- filtered_single_cell.markers %>% filter(cluster=="Keratinocyte-5")
+
+length(intersect(cluster.6$gene,Keratinocyte.5$gene))
+```
+## MIA FOR HANNIFA PAPER
+```{r}
+hnf_skin_scRNA.markers <- read.csv("../scRNA_DATA/HANNIFA_MARKERS.csv") %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
+```
+
+```{r}
+##INTERSECT GENES BETWEEN scRNA and Spatial data
+st.genes <- unique(rownames(new.skin.combined@assays$Spatial@counts))
+sc.genes <- unique(rownames(healthy_skin.sc_data@assays$RNA@counts))
+all.genes.scrna_and_spt <- unique(intersect(sc.genes,st.genes))
+```
+
+```{r}
+MIA_results_PART_2 <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = hnf_skin_scRNA.markers,spatial.markers = filtered_spatial_markers)
+
+E.data_PART_2 <- MIA_results_PART_2 %>% column_to_rownames("cluster")
+E.data_PART_2 <- E.data_PART_2[,order(colnames(E.data_PART_2))]
+is.na(E.data_PART_2) <- do.call(cbind,lapply(E.data_PART_2, is.infinite))
+pheatmap(E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
+```
+
+```{r}
+## IMMUNE CELLS
+immune_only.E.data_PART_2 <- E.data_PART_2[,c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK")]
+pdf(file = "MIA_regions_(HANNIFA_PAPER)_IMMUNE_CELLS.pdf",width = 10,height = 5)
+print(pheatmap(immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal))
+dev.off()
+```
+```{r}
+non_immune_only.E.data_PART_2 <- E.data_PART_2 %>% dplyr::select(-c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK","nan"))
+pdf(file = "MIA_regions_(HANNIFA_PAPER)_NON_IMMUNE_CELLS.pdf",width = 10,height = 5)
+print(pheatmap(non_immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal))
+dev.off()
+```
+
+```{r}
+pdf(file = "UMAP_ONLY_HEALTHY_SAMPLES_(HANNIFA_PAPER).pdf",width = 16,height=8)
+print(DimPlot(healthy_skin.sc_data_subset,pt.size = 1.2,shuffle = TRUE,raster=FALSE))
+dev.off()
+```
+
+```{r}
+#VIOLIN PLOT FOR UMIs and SEURAT CLUSTERS
+pdf(file = "VIOLIN_PLOT_UMIs_and_CLUSTERS_HEALTHY_SAMPLES.pdf",width = 16,height=12)
+print(VlnPlot(new.skin.combined,group.by = "seurat_clusters",features = "nCount_Spatial",cols = custom_colors_1))
+dev.off()
+
+# LOG TRANSFORMED UMI COUNTS
+pdf(file = "VIOLIN_PLOT_UMIs_and_CLUSTERS_HEALTHY_SAMPLES(LOG_TRANSFORMED).pdf",width = 16,height=12)
+print(VlnPlot(new.skin.combined,group.by = "seurat_clusters",features = "nCount_Spatial",cols = custom_colors_1,log = TRUE))
+dev.off()
+```
+
+```{r}
+# SPOT FREQUENCY TABLE - BY SPATIAL REGION
+spatial.freq <- as.data.frame(table(new.skin.combined@meta.data$Spatial.regions))
+write.csv(spatial.freq,file="SPATIAL_REGIONS_CLUSTERS_SPOT_COUNTS.csv")
+```
+
+
+## QC FIGURES - Replotting
+
+```{r}
+# HEALTHY FEMALE SKIN 2
+#REMOVE SPOTS
+HEALTHY.Female1.s3 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-1/",slice="HealthyFemale-1-S3")
+
+## HEALTHY FEMALE
+HEALTHY.Female2.s1 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-2E/",slice="HealthyFemale-2-S1")
+HEALTHY.Female2.s2 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HF-2F/",slice="HealthyFemale-2-S2")
+
+#HEALATHY MALE
+HEALTHY.Male.s2 <- Load10X_Spatial(data.dir ="../SEVENTH RUN/ST-HM-1/",slice="HealthyMale-1-S2")
+```
+```{r}
+remove.spots <- read.csv(file="../CLOUPE_FILES/SEVENTH_RUN/HF-1-SP/remove.csv")
+subset_spots <- Cells(HEALTHY.Female1.s3)[which((!(rownames(HEALTHY.Female1.s3@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female1.s3.clean <- subset(HEALTHY.Female1.s3,cells=subset_spots)
+
+pdf(width = 8,height=10,file = "HV2_SP_SPATIAL_PLOT(UNFILTERED).pdf")
+print(SpatialDimPlot(HEALTHY.Female1.s3.clean,pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+
+pdf(width = 8,height=10,file = "HV2_SP_SPATIAL_PLOT(FILTERED).pdf")
+print(SpatialDimPlot(new.skin.combined,images = "HealthyFemale.1.S3",pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+```
+
+```{r}
+remove.spots <- read.csv(file="../CLOUPE_FILES/SEVENTH_RUN/HF-2-SE/Remove.csv")
+subset_spots <- Cells(HEALTHY.Female2.s1)[which((!(rownames(HEALTHY.Female2.s1@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female2.s1.clean <- subset(HEALTHY.Female2.s1,cells=subset_spots)
+
+pdf(width = 8,height=10,file = "HV3_SE_SPATIAL_PLOT(UNFILTERED).pdf")
+print(SpatialDimPlot(HEALTHY.Female2.s1.clean,pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+
+pdf(width = 8,height=10,file = "HV3_SE_SPATIAL_PLOT(FILTERED).pdf")
+print(SpatialDimPlot(new.skin.combined,images = "HealthyFemale.2.S1",pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+```
+```{r}
+remove.spots <- read.csv(file="../CLOUPE_FILES/SEVENTH_RUN/HF-2-SP/Remove.csv")
+subset_spots <- Cells(HEALTHY.Female2.s2)[which((!(rownames(HEALTHY.Female2.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female2.s2.clean <- subset(HEALTHY.Female2.s2,cells=subset_spots)
+
+pdf(width = 8,height=10,file = "HV3_SP_SPATIAL_PLOT(UNFILTERED).pdf")
+print(SpatialDimPlot(HEALTHY.Female2.s2.clean,pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+
+pdf(width = 8,height=10,file = "HV3_SP_SPATIAL_PLOT(FILTERED).pdf")
+print(SpatialDimPlot(new.skin.combined,images = "HealthyFemale.2.S2",pt.size.factor = 2,group.by = "orig.ident"))
+dev.off()
+```
+
+```{r}
+remove.spots <- read.csv(file="../CLOUPE_FILES/SEVENTH_RUN/HM-SP-2/remove.csv")
+subset_spots <- Cells(HEALTHY.Male.s2)[which((!(rownames(HEALTHY.Male.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Male.s2.clean <- subset(HEALTHY.Male.s2,cells=subset_spots)
+
+pdf(width = 8,height=10,file = "HV1_SP_R2_SPATIAL_PLOT(UNFILTERED).pdf")
+print(SpatialDimPlot(HEALTHY.Male.s2.clean,pt.size.factor = 2.2,group.by = "orig.ident"))
+dev.off()
+
+pdf(width = 8,height=10,file = "HV1_SP_R2_SPATIAL_PLOT(FILTERED).pdf")
+print(SpatialDimPlot(new.skin.combined,images = "HealthyMale.1.S2",pt.size.factor = 2.2,group.by = "orig.ident"))
+dev.off()
+
+```
+### Import the spots to be removed from loupe browser.
+```{r}
+remove.spots <- read.csv(file="../FIFTH_RUN/SAMPLE D1/REMOVE.csv")
+subset_spots <- Cells(HEALTHY.Female1.s2)[which((!(rownames(HEALTHY.Female1.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female1.s2.clean <- subset(HEALTHY.Female1.s2,cells=subset_spots)
+```
+```{r}
+SpatialDimPlot(HEALTHY.Female.s2.clean)
+SpatialDimPlot(HEALTHY.Female1.s2.clean)
+
+pdf(width = 8,height=10,file = "HV2_SP_R2_SPATIAL_PLOT(UNFILTERED).pdf")
+print(SpatialDimPlot(HEALTHY.Female1.s2.clean,pt.size.factor = 2.2,group.by = "orig.ident"))
+dev.off()
+
+pdf(width = 8,height=10,file = "HV2_SP_R2_SPATIAL_PLOT(FILTERED).pdf")
+print(SpatialDimPlot(new.skin.combined,images = "HealthyFemale.1.S2",pt.size.factor = 2.2,group.by = "orig.ident"))
+dev.off()
+```
+
+## AVERAGE GENE COUNTS
+```{r}
+Idents(new.skin.combined) <- "seurat_clusters"
+
+clusters <- unique(new.skin.combined@meta.data$seurat_clusters) %>% as.vector()
+
+for(x in clusters){
+  avg_exp.cluster <- AverageExpression(new.skin.combined,slot = "counts",assay="Spatial") %>% as.data.frame() %>% dplyr::select(paste("Spatial.",x,sep = "")) %>% filter(x>0) %>% write.csv(file = paste("CLUSTER_",x,"_GENE_COUNTS.csv",sep = ""))
+}
+```
+
+```{r}
+avg_exp.all_clusters <- AverageExpression(new.skin.combined,slot = "counts",assay="Spatial") %>% as.data.frame()
+write.csv(avg_exp.all_clusters,file="ALL_CLUSTERS_GENE_COUNTS.csv")
+
+avg_exp.cluster_4 <- AverageExpression(new.skin.combined,slot = "counts",assay="Spatial") %>% as.data.frame() %>% dplyr::select("Spatial.4.Hypodermis") %>% filter(Spatial.4.Hypodermis>0)
+write.csv(avg_exp.cluster_4,file="CLUSTER_4_GENE_COUNTS.csv")
+avg_exp.cluster_2 <- AverageExpression(new.skin.combined,slot = "counts",assay="Spatial") %>% as.data.frame() %>% dplyr::select("Spatial.2.Dermis.adipose") %>% filter(Spatial.2.Dermis.adipose>0)
+write.csv(avg_exp.cluster_2,file="CLUSTER_2_GENE_COUNTS.csv")
+```
+
+## HANNIFA DATA - NEW UMAP
+```{r}
+healthy_skin.sc_data <- FindNeighbors(healthy_skin.sc_data, dims = 1:40)
+healthy_skin.sc_data <- FindClusters(healthy_skin.sc_data, verbose = FALSE,resolution = 1)
+healthy_skin.sc_data <- RunUMAP(healthy_skin.sc_data, dims = 1:40)
+```
+```{r}
+Idents(healthy_skin.sc_data) <- "final_clustering"
+healthy_skin.sc_data <- subset(healthy_skin.sc_data,idents = c("nan"),invert=TRUE)
+```
+
+```{r}
+pdf(width = 12,height=8,file = "UMAP_HANNIFA_DATA_HEALTHY_SAMPLES_ONLY.pdf")
+DimPlot(healthy_skin.sc_data,pt.size = 3.5,raster=FALSE)
+dev.off()
+```

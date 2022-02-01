@@ -112,12 +112,13 @@ GO_PATHWAYS_ENRICH <- function(MARKERS,ONT,OUTPUT){
   
   GO_res_DOWN <- enrichGO(down.gene$gene,OrgDb = org.Hs.eg.db,keyType = 'SYMBOL',pvalueCutoff = 0.1,ont= ONT)
   if(is.null(GO_res_UP)){
-  }else{
+  }
+  else{
     GO_res_UP <- as.data.frame(GO_res_UP)
     write.csv(GO_res_UP,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_UP_GO_RESULTS_",ONT,".csv",sep=""))
   }
   if(is.null(GO_res_DOWN)){
-  } else {
+  } e;se {
     GO_res_DOWN <- as.data.frame(GO_res_DOWN)
     write.csv(GO_res_DOWN,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_DOWN_GO_RESULTS_",ONT,".csv",sep=""))
   }
@@ -131,8 +132,8 @@ KEGG_PATHWAYS <- function(MARKERS,OUTPUT){
   KEGG_res_UP <- enrichKEGG(ge_list_2$ENTREZID,organism= 'hsa',pvalueCutoff = 0.1)
   if (is.null(KEGG_res_UP)){
   } else {
-  KEGG_res_UP <- setReadable(KEGG_res_UP, OrgDb = org.Hs.eg.db,keyType = "ENTREZID") %>% as.data.frame()
-  write.csv(KEGG_res_UP,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_UP_KEGG_RESULTS_",".csv",sep=""))
+    KEGG_res_UP <- setReadable(KEGG_res_UP, OrgDb = org.Hs.eg.db,keyType = "ENTREZID") %>% as.data.frame()
+    write.csv(KEGG_res_UP,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_UP_KEGG_RESULTS_",".csv",sep=""))
   }
   down.gene <- MARKERS %>% filter(avg_log2FC<(-0.25)) %>% arrange(avg_log2FC) %>% dplyr::select(c("gene"))
   ge_list_2 <- bitr(down.gene$gene,fromType = "SYMBOL",toType ="ENTREZID",OrgDb =org.Hs.eg.db,drop=TRUE)
@@ -174,7 +175,7 @@ st_enrichment <- function(sc.data,st.data,Cell_types){
     print(SpatialFeaturePlot(st.data, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE) + scale_fill_gradientn(colors=cols,limits = c(0,1.00001))) 
     dev.off()
   }
-
+  
 }
 st_enrichment_v2 <- function(sc.data,st.data,Cell_types){
   st.data <- st_filter_by_genes(st.data = st.data,x = 200)
@@ -204,4 +205,28 @@ pseudo_bulk_out <- function(Seurat_obj,group_label,groups_tbl_path){
   dds <- DESeqDataSetFromMatrix(countData = counts.final,colData=groups.table,design = ~BATCH + GROUP_I)
   dds <- DESeq(dds)
   return(dds)
+  #pdf(file=paste("PCA",,"PLOT_PSEUDOBULK.pdf"),height = 8,width = 10)
+  #print(plotPCA(vsd, intgroup=c("GROUP_I", "SEVERITY")))
+  #dev.off()
+  
+  #sampleDists <- dist(t(assay(vsd)))
+  
+  #sampleDistMatrix <- as.matrix(sampleDists)
+  #rownames(sampleDistMatrix) <- paste(vsd$GROUP_I, vsd$SEVERITY,vsd$GROUP_II, sep="-")
+  #colnames(sampleDistMatrix) <- NULL
+  #colors <- colorRampPalette(brewer.pal(9, "RdYlBu")) (255)
+  #pdf("HC_WITH_HEATMAP.pdf",height = 15,width = 15)
+  #print(pheatmap(sampleDistMatrix,
+  #               clustering_distance_rows=sampleDists,
+  #               clustering_distance_cols=sampleDists,
+  #               col=colors))
+  #dev.off()
+  
+  #sampleDists <- dist(t(assay(vsd)))
+  
+  #hc <- hclust(sampleDists)
+  
+  #pdf("DENDOGRAM_ALL_SAMPLES.pdf",height = 10,width = 10)
+  #print(plot(hc, labels=paste(vsd$GROUP_I,vsd$SEVERITY,vsd$GROUP_II,sep = ":")))
+  #dev.off()
 }

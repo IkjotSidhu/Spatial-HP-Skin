@@ -406,6 +406,7 @@ hnf_skin_scRNA.markers <- read.csv("../../scRNA_DATA/HANNIFA_MARKERS.csv") %>% f
 ```
 
 ```{r}
+
 hnf_data_counts <- as.data.frame(table(healthy_skin.sc_data@meta.data$final_clustering))
 write.csv(hnf_data_counts,file="HEALTHY_SAMPLES_HANNIFA_DATA_COUNTS.csv")
 ```

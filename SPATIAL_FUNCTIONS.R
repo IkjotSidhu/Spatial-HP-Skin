@@ -118,7 +118,7 @@ GO_PATHWAYS_ENRICH <- function(MARKERS,ONT,OUTPUT){
     write.csv(GO_res_UP,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_UP_GO_RESULTS_",ONT,".csv",sep=""))
   }
   if(is.null(GO_res_DOWN)){
-  } e;se {
+  } else {
     GO_res_DOWN <- as.data.frame(GO_res_DOWN)
     write.csv(GO_res_DOWN,file=paste(deparse(substitute(MARKERS)),OUTPUT,"_DOWN_GO_RESULTS_",ONT,".csv",sep=""))
   }

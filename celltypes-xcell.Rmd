@@ -1,0 +1,136 @@
+---
+title: "ST xCell cell type enrichment analysis"
+subtitle: "ST"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    theme: readable
+    code_folding: none
+---
+
+```{r packages}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(glue)
+  library(xCell)
+  library(pheatmap)
+  library(ggsci)
+  library(writexl)
+})
+```
+
+# define inputs/outputs
+
+input
+
+```{r}
+subset_label = "healthy"
+subset_label = "all"
+subset_label = "all-per-group"
+
+exp_csv = glue("./data/{subset_label}.expression.mean.csv")
+if (!file.exists(exp_csv)) stop()
+```
+
+output
+
+```{r}
+out_dir = "./out-celltypes-xcell"
+dir.create(out_dir, showWarnings = FALSE)
+out_dir = glue("{out_dir}/{subset_label}")
+dir.create(out_dir, showWarnings = FALSE)
+```
+
+
+xCell input: normalizing to gene length (RPKM/FPKM/TPM/RSEM) is required
+
+```{r message=FALSE, warning=FALSE}
+exp_tbl = read_csv(exp_csv, show_col_types = FALSE)
+dim(exp_tbl)
+```
+
+```{r}
+head(exp_tbl)
+```
+
+convert to matrix for xCell
+
+```{r}
+exp_mat =
+  exp_tbl %>%
+  as.data.frame() %>%
+  column_to_rownames("gene") %>%
+  as.matrix()
+head(exp_mat)
+```
+
+```{r}
+quantile(colSums(exp_mat))
+```
+
+run xCell analysis
+
+```{r message=FALSE, warning=FALSE}
+xcell_mat = xCellAnalysis(exp_mat)
+```
+
+save full xCell matrix
+
+```{r}
+xcell_tbl = xcell_mat %>% round(3) %>% as_tibble(rownames = "cell_type")
+write_csv(xcell_tbl, glue("{out_dir}/celltypes.xcell.csv"))
+```
+
+check matrix
+
+```{r}
+head(xcell_tbl)
+```
+
+filter out "Score" categories
+
+```{r}
+xcell_tbl = xcell_tbl %>% filter(!str_detect(cell_type, "Score"))
+```
+
+filter out cell types with only low scores
+
+```{r}
+xcell_mat_filtered =
+  xcell_tbl %>% as.data.frame() %>% column_to_rownames("cell_type") %>% as.matrix()
+xcell_mat_filtered =
+  xcell_mat_filtered[matrixStats::rowMaxs(xcell_mat_filtered) > 0.05, ]
+head(xcell_mat_filtered)
+```
+
+heatmap
+
+```{r}
+hm_colors = colorRampPalette(c("#FFFFFF", "#E41A1C"))(51)
+hm_base = glue("{out_dir}/celltypes.xcell.heatmap")
+
+ph_obj = pheatmap(
+  xcell_mat_filtered, col = hm_colors, border_color = NA,
+  fontsize_row = 10, fontsize_col = 12
+)
+
+# png(glue("{hm_base}.png"), width = 6, height = 7, units = "in", res = 300)
+png(glue("{hm_base}.png"), width = 10, height = 10, units = "in", res = 300)
+grid::grid.newpage()
+grid::grid.draw(ph_obj$gtable)
+dev.off()
+Sys.sleep(1)
+# pdf(glue("{hm_base}.pdf"), width = 6, height = 7)
+pdf(glue("{hm_base}.pdf"), width = 10, height = 10)
+grid::grid.newpage()
+grid::grid.draw(ph_obj$gtable)
+dev.off()
+```
+
+# session info
+
+```{r}
+sessionInfo()
+```
+
+

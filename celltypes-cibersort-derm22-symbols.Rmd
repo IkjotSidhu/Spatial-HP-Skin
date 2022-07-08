@@ -1,0 +1,142 @@
+---
+title: "convert DerM22 signature matrix from probe IDs to gene symbols"
+subtitle: ""
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    theme: readable
+    code_folding: none
+---
+
+"Characterization of disease-specific cellular abundance profiles of chronic inflammatory skin conditions from deconvolution of biopsy samples" (https://doi.org/10.1186/s12920-019-0567-7)
+
+```{r message=TRUE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(glue)
+})
+```
+
+import the original DerM22 matrix
+
+```{r message=FALSE, warning=FALSE}
+derm22_tbl = read_tsv("CIBERSORT.DerM22.probes.txt", show_col_types = FALSE)
+dim(derm22_tbl)
+```
+
+```{r}
+head(derm22_tbl)
+```
+
+```{r}
+derm22_mat = derm22_tbl %>% column_to_rownames("probe_id") %>% as.matrix()
+derm22_mat[1:5, 1:3]
+```
+
+import the original LM22 matrix
+
+```{r message=FALSE, warning=FALSE}
+lm22_tbl = read_tsv("CIBERSORT.LM22.txt", show_col_types = FALSE)
+dim(lm22_tbl)
+```
+
+```{r}
+lm22_mat = lm22_tbl %>% column_to_rownames("Gene symbol") %>% as.matrix()
+lm22_mat[1:5, 1:3]
+```
+
+check the distribution of values
+
+```{r}
+hist(log(derm22_mat + 0.001), breaks = 50, col = "black")
+```
+
+```{r}
+hist(log(lm22_mat + 0.001), breaks = 50, col = "black")
+```
+
+add gene names to probes
+
+```{r}
+mart = biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "https://may2021.archive.ensembl.org")
+```
+
+```{r}
+probes_tbl = biomaRt::getBM(
+  mart = mart,
+  attributes = c("affy_hg_u133_plus_2", "external_gene_name"),
+  filters = "affy_hg_u133_plus_2",
+  values = rownames(derm22_mat),
+  uniqueRows = TRUE
+)
+dim(probes_tbl)
+```
+
+```{r}
+probes_tbl =
+  probes_tbl %>%
+  rename(probe_id = affy_hg_u133_plus_2, gene = external_gene_name)
+head(probes_tbl)
+```
+
+remove probes without gene names
+
+```{r}
+probes_tbl = probes_tbl %>% filter(gene != "") %>% arrange(gene, probe_id)
+dim(probes_tbl)
+```
+
+add variance to probes
+
+```{r}
+probes_tbl =
+  probes_tbl %>%
+  inner_join(
+    tibble(
+      probe_id = rownames(derm22_mat),
+      variance = matrixStats::rowVars(derm22_mat)
+    ),
+    by = "probe_id"
+  )
+dim(probes_tbl)
+```
+
+for genes with multiple probes, select the probe with highest variance
+
+```{r}
+probes_tbl =
+  probes_tbl %>%
+  group_by(gene) %>%
+  slice_max(variance, n = 1) %>%
+  ungroup()
+dim(probes_tbl)
+```
+
+replace probe IDs with gene names in the original table
+
+```{r}
+derm22_tbl =
+  probes_tbl %>%
+  select(probe_id, gene) %>%
+  inner_join(derm22_tbl, by = "probe_id") %>%
+  select(!probe_id)
+dim(derm22_tbl)
+```
+
+```{r}
+head(derm22_tbl)
+```
+
+save
+
+```{r}
+write_tsv(derm22_tbl, "CIBERSORT.DerM22.genes.txt")
+```
+
+session info
+
+```{r}
+sessionInfo()
+```
+
+

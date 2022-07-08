@@ -1,0 +1,170 @@
+---
+title: "CIBERSORT cell type deconvolution"
+subtitle: "ST"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    theme: readable
+    code_folding: none
+---
+
+```{r message=TRUE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(glue)
+  library(pheatmap)
+  library(ggplot2)
+  library(cowplot)
+  library(ggsci)
+})
+```
+
+```{r}
+source("./CIBERSORT.R")
+```
+
+# define inputs/outputs
+
+input
+
+```{r}
+subset_label = "healthy"
+subset_label = "all"
+subset_label = "all-per-group"
+
+exp_csv = glue("./data/{subset_label}.expression.mean.csv")
+if (!file.exists(exp_csv)) stop()
+```
+
+output
+
+```{r}
+out_dir = "./out-celltypes-cibersort"
+dir.create(out_dir, showWarnings = FALSE)
+out_dir = glue("{out_dir}/{subset_label}")
+dir.create(out_dir, showWarnings = FALSE)
+```
+
+CIBERSORT input: "should be in non-log linear space with positive numerical values"
+
+```{r message=FALSE, warning=FALSE}
+exp_tbl = read_csv(exp_csv, show_col_types = FALSE)
+dim(exp_tbl)
+```
+
+```{r}
+head(exp_tbl)
+```
+
+check the distribution of values for one sample
+
+```{r}
+example_exp = exp_tbl %>% pull(2)
+example_exp = example_exp[example_exp > quantile(example_exp, 0.05) & example_exp < quantile(example_exp, 0.95)]
+hist(example_exp, breaks = 50, col = "black")
+```
+
+check the total counts
+
+```{r}
+exp_tbl %>% select(!gene) %>% colSums() %>% quantile() %>% scales::comma()
+```
+
+save expression table as a tab-delimited file
+
+```{r}
+mixture_txt = glue("{out_dir}/cibersort.mixture.tsv")
+write_tsv(exp_tbl, mixture_txt)
+```
+
+run CIBERSORT analysis
+
+"we recommend that RNA-Seq data not undergo quantile normalization (enabled by default)"
+
+```{r message=FALSE, warning=FALSE}
+signature_txt = "CIBERSORT.LM22.txt"
+cibersort_mat =
+  CIBERSORT(
+    sig_matrix = signature_txt,
+    mixture_file = mixture_txt,
+    perm = 1000,
+    QN = FALSE
+  )
+```
+
+clean up and save the CIBERSORT matrix
+
+```{r}
+cibersort_tbl =
+  t(cibersort_mat) %>%
+  round(5) %>%
+  as.data.frame() %>%
+  rownames_to_column("cell_type") %>%
+  as_tibble() %>%
+  filter(!cell_type %in% c("P-value", "Correlation", "RMSE"))
+write_csv(cibersort_tbl, glue("{out_dir}/celltypes-cibersort.csv"))
+cibersort_tbl
+```
+
+filter out cell types with only low scores
+
+```{r}
+cibersort_mat_filtered =
+  cibersort_tbl %>% as.data.frame() %>% column_to_rownames("cell_type") %>% as.matrix()
+cibersort_mat_filtered[1:10, 1:5]
+```
+
+heatmap
+
+```{r}
+heatmap_colors = colorRampPalette(c("#FFFFFF", "#E41A1C"))(50)
+pheatmap(
+  cibersort_mat_filtered, border_color = NA, color = heatmap_colors,
+)
+pheatmap(
+  cibersort_mat_filtered, border_color = NA, color = heatmap_colors,
+  fontsize_row = 12, fontsize_col = 12,
+  filename = glue("{out_dir}/celltypes-cibersort.heatmap.png"), width = 10, height = 8
+)
+pheatmap(
+  cibersort_mat_filtered, border_color = NA, color = heatmap_colors,
+  fontsize_row = 12, fontsize_col = 12,
+  filename = glue("{out_dir}/celltypes-cibersort.heatmap.pdf"), width = 10, height = 8
+)
+```
+
+```{r}
+cibersort_tbl_long = cibersort_tbl %>% gather(key = "sample", value = "fraction", -cell_type)
+
+# select population for ordering samples
+sample_order =
+  cibersort_tbl_long %>%
+  filter(cell_type == "Macrophages M2") %>%
+  arrange(-fraction) %>%
+  pull(sample)
+
+bar_plot = ggplot(cibersort_tbl_long) +
+  geom_bar(
+    aes(
+      x = fct_relevel(sample, sample_order),
+      y = fraction,
+      fill = fct_reorder(cell_type, fraction, .desc = TRUE)
+    ),
+    stat = "identity") +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_cowplot() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(x = "sample", fill = "cell type") +
+  scale_fill_igv()
+save_plot(glue("{out_dir}/celltypes-cibersort.barplot.png"), plot = bar_plot, base_height = 6, base_width = 12)
+save_plot(glue("{out_dir}/celltypes-cibersort.barplot.pdf"), plot = bar_plot, base_height = 6, base_width = 12)
+bar_plot
+```
+
+session info
+
+```{r}
+sessionInfo()
+```
+
+

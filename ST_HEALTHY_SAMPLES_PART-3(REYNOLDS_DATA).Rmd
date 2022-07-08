@@ -1,12 +1,16 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Hannifa et al. single cell - healthy skin data subset"
+output: github_document
 ---
 
-## ST HEALTHY SAMPLES
-# Integeration with REYNOLDS et al.
+# ST HEALTHY SAMPLES - PART 3
 
-Load all of the required packages
+## Integration with REYNOLDS et al 
+
+## (DOI - <https://doi.org/10.1126/science.aba6500>).
+
+### Load all of the required packages
+
 ```{r}
 library(tidyverse)
 library(Seurat)
@@ -16,41 +20,86 @@ library(pheatmap)
 library(scales)
 ```
 
-# Import functions from the custom R script
+### Import functions from the custom R script
+
 ```{r}
 source("SPATIAL_FUNCTIONS.R")
 ```
-## LOAD DATA FROM HANNIFA PAPER
+
+### Load processed single cell R data.
+
+(*replace this with zenodo repo link for final release)*
+
 ```{r}
 load("../../scRNA_DATA/HEALTHY_SC_RNA_PROCESSED.RData")
 ```
 
-# UMAP plot for Hannifa healthy skin data
+### UMAP plot for healthy skin data
+
+### (Using final_clustering labels from the original manuscript)
+
 ```{r}
+healthy_skin.sc_data <- FindNeighbors(healthy_skin.sc_data, dims = 1:40)
+healthy_skin.sc_data <- FindClusters(healthy_skin.sc_data, verbose = FALSE,resolution = 1)
+healthy_skin.sc_data <- RunUMAP(healthy_skin.sc_data, dims = 1:40)
+```
+
+### Remove unlabeled cells (NAN) from the dataset
+
+```{r}
+Idents(healthy_skin.sc_data) <- "final_clustering"
+healthy_skin.sc_data <- subset(healthy_skin.sc_data,idents = c("nan"),invert=TRUE)
+```
+
+```{r}
+healthy_skin.sc_data <- readRDS("../scRNA_DATA/healthy_skin.sc_data_HNF.RDS")
+```
+
+```{r}
+#pdf(width = 12,height=8,file = "UMAP_HANNIFA_DATA_HEALTHY_SAMPLES_ONLY.pdf")
+DimPlot(healthy_skin.sc_data,pt.size = 3.5,raster=FALSE)
+#dev.off()
+```
+
+```{r}
+
+Idents(healthy_skin.sc_data) <- "final_clustering"
 DimPlot(healthy_skin.sc_data,raster = FALSE)
 
 pdf(file = "UMAP_ONLY_HEALTHY_SAMPLES_(HANNIFA_PAPER).pdf",width = 16,height=8)
 print(DimPlot(healthy_skin.sc_data_subset,pt.size = 1.2,shuffle = TRUE,raster=FALSE))
 dev.off()
 ```
-# Identify marker genes for the pre-assigned clustering results with cell type labels
-```{r}
+
+### Identify marker genes for the final_clustering labels
+
+```{r,eval=FALSE}
 Idents(healthy_skin.sc_data) <- "final_clustering"
 hnf_skin_scRNA.markers <- FindAllMarkers(healthy_skin.sc_data,assay = "RNA",logfc.threshold = 0.25,max.cells.per.ident=400,only.pos = TRUE)
+write.csv(hnf_skin_scRNA.markers,"../../scRNA_DATA/HANNIFA_MARKERS.csv")
 ```
 
-# Load MARKER GENES from the saved file for later use
+### Load marker genes from the saved file for later use
+
 ```{r}
 hnf_skin_scRNA.markers <- read.csv("../../scRNA_DATA/HANNIFA_MARKERS.csv") %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
 ```
 
-#SC-DATA - cell counts
+### Cell counts / frequency for each cell type in the processed Seurat object
+
 ```{r}
 hnf_data_counts <- as.data.frame(table(healthy_skin.sc_data@meta.data$final_clustering))
 write.csv(hnf_data_counts,file="HEALTHY_SAMPLES_HANNIFA_DATA_COUNTS.csv")
 ```
 
-# Intersecting genes between ST and scRNA data.
+### MIA ( Multi-modal intersection analysis)
+
+### original publication- (<https://doi.org/10.1038/s41587-019-0392-8>)
+
+#### pre-computation parameters
+
+#### Number of intersecting / common genes between ST and scRNA data -set as background genes.
+
 ```{r}
 ##INTERSECT GENES BETWEEN scRNA and Spatial data
 st.genes <- unique(rownames(new.skin.combined@assays$Spatial@counts))
@@ -58,7 +107,8 @@ sc.genes <- unique(rownames(healthy_skin.sc_data@assays$RNA@counts))
 all.genes.scrna_and_spt <- unique(intersect(sc.genes,st.genes))
 ```
 
-## MIA FOR HANNIFA PAPER - healthy samples data only
+### Calculate cell type enrichment scores for all cell types in the dataset - healthy sample data only
+
 ```{r}
 MIA_results_PART_2 <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = hnf_skin_scRNA.markers,spatial.markers = filtered_spatial_markers)
 
@@ -68,16 +118,19 @@ is.na(E.data_PART_2) <- do.call(cbind,lapply(E.data_PART_2, is.infinite))
 pheatmap(E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
 ```
 
-# For Immune populations
+### Immune cell types only
+
 ```{r}
 ## IMMUNE CELLS
 immune_only.E.data_PART_2 <- E.data_PART_2[,c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK")]
 pdf(file = "MIA_regions_(HANNIFA_PAPER)_IMMUNE_CELLS.pdf",width = 10,height = 5)
 print(pheatmap(immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal))
 dev.off()
+
 ```
 
-# For non-immune populations
+### Non-Immune / Structural cell types
+
 ```{r}
 non_immune_only.E.data_PART_2 <- E.data_PART_2 %>% dplyr::select(-c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK","nan"))
 pdf(file = "MIA_regions_(HANNIFA_PAPER)_NON_IMMUNE_CELLS.pdf",width = 10,height = 5)
@@ -85,21 +138,4 @@ print(pheatmap(non_immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows =
 dev.off()
 ```
 
-
-## HANNIFA DATA - NEW UMAP
-```{r}
-healthy_skin.sc_data <- FindNeighbors(healthy_skin.sc_data, dims = 1:40)
-healthy_skin.sc_data <- FindClusters(healthy_skin.sc_data, verbose = FALSE,resolution = 1)
-healthy_skin.sc_data <- RunUMAP(healthy_skin.sc_data, dims = 1:40)
-```
-```{r}
-Idents(healthy_skin.sc_data) <- "final_clustering"
-healthy_skin.sc_data <- subset(healthy_skin.sc_data,idents = c("nan"),invert=TRUE)
-```
-
-```{r}
-pdf(width = 12,height=8,file = "UMAP_HANNIFA_DATA_HEALTHY_SAMPLES_ONLY.pdf")
-DimPlot(healthy_skin.sc_data,pt.size = 3.5,raster=FALSE)
-dev.off()
-```
-
+## 

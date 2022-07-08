@@ -1,18 +1,27 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Sullivan et al. single cell data - Preadipocytes and Adipose precursor cells"
+output: github_document
 ---
+
+# ST HEALTHY SAMPLES - PART 4
+
+## Integration with Sullivan et al 
+
+## (DOI- <https://doi.org/10.1038/s41590-021-00922-4>)
 
 ```{r}
 library(Seurat)
 library(tidyverse)
 library(extrafont) 
-font_import()
-loadfonts(device = "win")
+#font_import()
+#loadfonts(device = "win")
 ```
 
-# Loading data from Sullivan et al
-```{r}
+### Loading data from Sullivan et al
+
+Only importing healthy / lean samples from the paper.
+
+```{r,eval=FALSE}
 lean_1.cd45_neg <- data.table::fread("https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4717nnn/GSM4717152/suppl/GSM4717152_CD45N-L1.csv.gz")
 lean_2.cd45_neg <- data.table::fread("https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4717nnn/GSM4717153/suppl/GSM4717153_CD45N-L2.csv.gz")
 lean_3.cd45_neg <- data.table::fread("https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4717nnn/GSM4717154/suppl/GSM4717154_CD45N-L3.csv.gz")
@@ -22,8 +31,9 @@ lean.cd200r_neg <- data.table::fread("https://ftp.ncbi.nlm.nih.gov/geo/samples/G
 lean.cd200r_pos <- data.table::fread("https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM4724nnn/GSM4724863/suppl/GSM4724863_CD200r_Positive_Lean.csv.gz")
 ```
 
-# Add gene names to to single cell data
-```{r}
+### Add gene names / HGNC symbols to the raw matrix
+
+```{r,eval=FALSE}
 library(biomaRt)
 ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
 attributes = listAttributes(ensembl)
@@ -37,7 +47,7 @@ Gene.names <- Gene.names %>% filter (! duplicated('ensembl_gene_id')) %>% as_tib
 
 ```
 
-```{r}
+```{r,eval=FALSE}
 lean_1.cd45_neg <- lean_1.cd45_neg[lean_1.cd45_neg$V1 %in% Gene.names$ensembl_gene_id ,]
 lean_2.cd45_neg <- lean_2.cd45_neg[lean_2.cd45_neg$V1 %in% Gene.names$ensembl_gene_id ,] 
 lean_3.cd45_neg <-lean_3.cd45_neg[lean_3.cd45_neg$V1 %in% Gene.names$ensembl_gene_id ,] 
@@ -48,14 +58,14 @@ lean.cd200r_pos <- lean.cd200r_pos[lean.cd200r_pos$V1 %in% Gene.names$ensembl_ge
 
 ```
 
-
-```{r}
+```{r,eval=FALSE}
 lean_1.cd45_neg_with_symbols <- left_join(lean_1.cd45_neg,Gene.names,by=c("V1"="ensembl_gene_id"),keep=TRUE) %>% filter(!is.na("hgnc_symbol") | "hgnc_symbol" != "") %>%  distinct(ensembl_gene_id, .keep_all = TRUE) %>% dplyr::select(-c("V1","ensembl_gene_id")) %>%  distinct(hgnc_symbol, .keep_all = TRUE) %>% column_to_rownames("hgnc_symbol") %>% filter(rowMeans(is.na(.)) < 0.1)
 
 other.samples <- list(lean_2.cd45_neg,lean_3.cd45_neg,lean.DC,lean.MAC,lean.cd200r_neg,lean.cd200r_pos)
 
 ```
-```{r}
+
+```{r,eval=FALSE}
 i <- 1
 while(i <= length(other.samples)){
   filtered_data <- left_join(other.samples[[i]],Gene.names,by=c("V1"="ensembl_gene_id"),keep=TRUE) %>% filter(!is.na("hgnc_symbol") | "hgnc_symbol" != "") %>%  distinct(ensembl_gene_id, .keep_all = TRUE) %>% dplyr::select(-c("V1","ensembl_gene_id")) %>%  distinct(hgnc_symbol, .keep_all = TRUE) %>% column_to_rownames("hgnc_symbol") %>% filter(rowMeans(is.na(.)) < 0.1)
@@ -64,7 +74,9 @@ while(i <= length(other.samples)){
 }
 ```
 
-```{r}
+### Generate seurat objects from scRNA matrix.
+
+```{r,eval=FALSE}
 lean_1.cd45_neg.obj <- CreateSeuratObject(counts=lean_1.cd45_neg_with_symbols,project = "LEAN DONOR 1 - CD45 -")
 lean_2.cd45_neg.obj <- CreateSeuratObject(counts=other.samples[[1]],project = "LEAN DONOR 2 - CD45 -")
 lean_3.cd45_neg.obj <- CreateSeuratObject(counts=other.samples[[2]],project = "LEAN DONOR 3 - CD45 -")
@@ -74,11 +86,15 @@ lean.cd200r_neg.obj <- CreateSeuratObject(counts=other.samples[[5]],project = "L
 lean.cd200r_pos.obj <- CreateSeuratObject(counts=other.samples[[6]],project = "LEAN DONOR 3 - CD200R +")
 ```
 
-```{r}
+### Combine all lean samples into one seurat object
+
+```{r,eval=FALSE}
 combined_lean_samples.obj <- merge(lean_1.cd45_neg.obj,c(lean_2.cd45_neg.obj,lean_3.cd45_neg.obj,lean.DC.obj ,lean.MAC.obj,lean.cd200r_neg.obj,lean.cd200r_pos.obj))
 ```
 
-```{r}
+### QC step - calculate mt percent expression
+
+```{r,eval=FALSE}
 # calculate the percentage of mitochondrial genes here and store it in percent.mito using the AddMetaData
 mt_genes = grep("^MT-", rownames(GetAssayData(combined_lean_samples.obj)), ignore.case = TRUE, value = TRUE)
 percent_mt = Matrix::colSums(GetAssayData(combined_lean_samples.obj)[mt_genes, ]) / Matrix::colSums(GetAssayData(combined_lean_samples.obj))
@@ -87,36 +103,60 @@ percent_mt = round(percent_mt * 100, digits = 3)
 combined_lean_samples.obj = AddMetaData(combined_lean_samples.obj, metadata = percent_mt, col.name = "percent.mt")
 ```
 
-```{r}
+### General QC plot 
+
+```{r,eval=FALSE}
 VlnPlot(combined_lean_samples.obj, features = c("nFeature_RNA", "nCount_RNA","percent.mt"), ncol = 3)
 ```
 
-```{r}
+### Filter samples using same QC parameters as the orignal paper
+
+```{r,eval=FALSE}
 combined_lean_samples.obj <- subset(combined_lean_samples.obj, subset = nFeature_RNA > 500 & percent.mt < 25)
 ```
 
-```{r}
+### Normalization and Scaling data
+
+```{r,eval=FALSE}
 combined_lean_samples.obj <- NormalizeData(combined_lean_samples.obj, normalization.method = "LogNormalize", scale.factor = 10000)
 combined_lean_samples.obj <- FindVariableFeatures(combined_lean_samples.obj, selection.method = "vst", nfeatures = 2000)
 ```
 
-```{r}
+```{r,eval=FALSE}
 all.genes <- rownames(combined_lean_samples.obj)
 combined_lean_samples.obj <- ScaleData(combined_lean_samples.obj, features = all.genes)
 ```
 
-```{r}
+### Run PCA
+
+```{r,eval=FALSE}
 combined_lean_samples.obj <- RunPCA(combined_lean_samples.obj, features = VariableFeatures(object = combined_lean_samples.obj))
 ```
 
-```{r}
+### UMAP and clustering
+
+```{r,eval=FALSE}
 combined_lean_samples.obj <- FindNeighbors(combined_lean_samples.obj, dims = 1:20)
 combined_lean_samples.obj <- FindClusters(combined_lean_samples.obj, resolution = 0.5)
 ```
 
-```{r}
+```{r,eval=FALSE}
 combined_lean_samples.obj <- RunUMAP(combined_lean_samples.obj, dims = 1:20)
 ```
+
+### Save the output into RDS file
+
+```{r,eval=FALSE}
+saveRDS("../../scRNA ADIPOCYTES/LEAN_SAMPLES_SCRNA.RDS")
+```
+
+### Load the pre-processed data - RDS object
+
+```{r}
+combined_lean_samples.obj <- readRDS("../../scRNA ADIPOCYTES/LEAN_SAMPLES_SCRNA.RDS")
+```
+
+### Plot the UMAP (added cell type labels based on marker genes)
 
 ```{r}
 DimPlot(combined_lean_samples.obj)
@@ -131,6 +171,14 @@ FeaturePlot(combined_lean_samples.obj,features = c("TAGLN","HEXIM1"))
 FeaturePlot(combined_lean_samples.obj,features = c("VWF","CDH5"))
 ```
 
+# 
+
+```{r,eval=FALSE}
+saveRDS(combined_lean_samples.obj,file="../../scRNA ADIPOCYTES/LEAN_SAMPLES_SCRNA.RDS")
+```
+
+### Find Marker genes, plot a heatmap to label clusters by marker genes
+
 ```{r}
 combined_lean_samples.MARKERS <- FindAllMarkers(combined_lean_samples.obj, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "RNA")
 top10 <- combined_lean_samples.MARKERS %>%
@@ -139,14 +187,24 @@ top10 <- combined_lean_samples.MARKERS %>%
     top_n(n = 10, wt = avg_log2FC) 
 DoHeatmap(combined_lean_samples.obj, features = top10$gene,assay = "RNA") + NoLegend()
 ```
+
+### Label cell types of interest
+
 ```{r}
-cluster.ids <- c("Preadipocytes","Preadipocytes","APC","3","4","5","6","7","8","9","10","11","Endothelial Cells","Smooth Muscle","14","15","16","17")
+cluster.ids <- c("Preadipocytes","Preadipocytes","APC","3","4","5","6","7","8","9","10","11","Endothelial Cells","Smooth Muscle","14","15","16","17","18")
 names(cluster.ids) <- levels(combined_lean_samples.obj)
 combined_lean_samples.obj <- RenameIdents(combined_lean_samples.obj, cluster.ids)
 combined_lean_samples.obj$CellType <- Idents(combined_lean_samples.obj)
 ```
 
-## NOW CALCULATING ENRICHMENT USING NEW DATASET
+### Load the Healthy ST dataset
+
+```{r}
+load("../../scRNA_DATA/HEALTHY_SC_RNA_PROCESSED.RData")
+```
+
+### Calculate enrichment for each cell type (Using Seurat Anchor Integration)
+
 ```{r,eval=FALSE}
 # RUN THIS ON BIG PURPLE 
 skin_reference.3 <- SCTransform(combined_lean_samples.obj, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
@@ -174,7 +232,6 @@ col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
 spatial_markers.without_align <- FindAllMarkers(healthy_skin.merge,assay = "Spatial")
 ```
 
-## MIA - Sullivan paper
 ```{r}
 filtered_single_cell_markers <- combined_lean_samples.MARKERS %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
 filtered_spatial_markers <- new.skin.combined.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
@@ -197,7 +254,6 @@ E.data <- E.data[,order(colnames(E.data))]
 pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
 ```
 
-# MATURE FAT/ADIPOCYTE SIGNATURE
 ```{r}
 #Ob (leptin), Hoxc8, and Hoxc9
 #Mpzl2, Ebf3, and Fbox31
@@ -207,3 +263,42 @@ VlnPlot(new.skin.combined,features = adipocyte_genes_1)
 VlnPlot(new.skin.combined,features = adipocyte_genes_2)
 ```
 
+# PATHWAYS USING ENRICH R
+
+```{r}
+library(enrichR)
+setEnrichrSite("Enrichr")
+```
+
+```{r}
+dbs <- listEnrichrDbs()
+```
+
+```{r}
+dbs
+websiteLive <- TRUE
+```
+
+```{r}
+cluster.labels <- c("Preadipocytes","APC")
+dbs <- c("Elsevier_Pathway_Collection", "MGI_Mammalian_Phenotype_Level_4_2021", "KEGG_2021_Human","GO_Biological_Process_2021","GO_Cellular_Component_2021","GO_Molecular_Function_2021")
+dir.create("../../scRNA ADIPOCYTES/PATHWAYS-BY-CLUSTER/")
+for(x in cluster.labels){
+  de.genes <- FindMarkers(combined_lean_samples.obj,assay = "RNA",test.use = "wilcox",logfc.threshold = log2(1.1),ident.1 = x) %>% filter(p_val_adj<0.1) %>% rownames_to_column("Gene")
+  up.genes <- de.genes %>% filter(avg_log2FC>0)
+  down.genes <- de.genes %>% filter(avg_log2FC<0)
+  if(!is.null(up.genes)){
+    enriched <- enrichr(up.genes$Gene, dbs)
+    for(a in dbs){
+      write.csv(enriched[[a]],file=paste("../../scRNA ADIPOCYTES/PATHWAYS-BY-CLUSTER/",a,"CLUSTER_",x,"_UP_GENES.csv"),)
+    }
+  }
+  if(!is.null(down.genes)){
+    enriched <- enrichr(down.genes$Gene, dbs)
+    for(b in dbs){
+      write.csv(enriched[[b]],file=paste("../../scRNA ADIPOCYTES/PATHWAYS-BY-CLUSTER/",b,"CLUSTER_",x,"_DOWN_GENES.csv"),)
+    }
+  }
+
+}
+```

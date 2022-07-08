@@ -1,6 +1,6 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "TRAVIS HUGHES et al single cell- healthy skin subset"
+output: github_document
 ---
 
 ## ST HEALTHY SAMPLES
@@ -36,22 +36,13 @@ load("../../TRAVIS_scRNA_DATA/SkinSeuratTotal.Rdata")
 meta.data <- read.csv("../../TRAVIS_scRNA_DATA/Cell_Level_Metadata.csv")
 ```
 
+# ccopy meta.data to the seurat object
 ```{r}
 #AddMetaData(SkinSeuratTotal,metadata = meta.data$Specific_CellType,col.name = "Specific_Celltype")
 skin.meta.data <- as.data.frame(SkinSeuratTotal@meta.data) %>% rownames_to_column("CellID")
 inner_join(x=skin.meta.data,y=meta.data,by="CellID")
-```
 
-```{r}
 SkinSeuratTotal@meta.data <- inner_join(x=skin.meta.data,y=meta.data,by="CellID") %>% column_to_rownames("CellID")
-```
-
-
-```{r,eval=FALSE}
-SkinSeuratTotal@meta.data$Celltype <- meta.data$CellType
-SkinSeuratTotal@meta.data$Condition <- meta.data$Condition
-SkinSeuratTotal@meta.data$Celltype_specific <- meta.data$Specific
-SkinSeuratTotal@meta.data$SampleID <- meta.data$SampleCondition
 ```
 
 ```{r}
@@ -81,11 +72,12 @@ DimPlot(travis_NM_skin_scRNA,pt.size = 2.5)
 ```
 
 ```{r,eval=FALSE}
-save(travis_NM_skin_scRNA,file = "../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
+
+#saveRDS(travis_NM_skin_scRNA,file = "../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
 ```
 
 ```{r}
-travis_NM_skin_scRNA <- loadRDS("../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
+travis_NM_skin_scRNA <- readRDS(file="../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
 ```
 
 ```{r}
@@ -130,7 +122,7 @@ dev.off()
 # Seurat based cell type enrichment
 ```{r,eval=FALSE}
 # RUN THIS ON BIG PURPLE 
-skin_reference.2 <- SCTransform(travis_travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
+skin_reference.2 <- SCTransform(travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
     RunUMAP(dims = 1:40)
 anchors <- FindTransferAnchors(reference = skin_reference.2, query = new.skin.combined, normalization.method = "SCT")
 predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference.2$Specific_CellType, prediction.assay = TRUE, 
@@ -144,7 +136,7 @@ Cell_types <- c("Fibroblast-1","HairFollicle","Keratinocyte-5","Keratinocyte-3",
 DefaultAssay(new.skin.combined) <- "predictions_travis_data"
 for (x in Cell_types){
   pdf(file = paste("HEALTHY_FEMALE_1_R2_CELL_TYPE_",x,".pdf"),width = 10,height = 15)
-  print(SpatialFeaturePlot(new.skin.combined, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE,images = "HealthyFemale.1.S2") + scale_fill_gradientn(colors=cols,limits = c(0,1))) 
+  print(SpatialFeaturePlot(new.skin.combined, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE,images = "HealthyFemale.1.S2") + scale_fill_gradientn(colors=cols,limits = c(0,1.01))) 
   dev.off()
 }
 ```
@@ -165,6 +157,7 @@ DimPlot(travis_healthy_data.subset,pt.size = 2.5)
 ```
 
 # Plotting final travis healthy data UMAP
+# FIGURE -SUPPLEMENTARY S3
 ```{r}
 pdf(width = 12,height=8,file = "UMAP_TRAVIS_DATA_HEALTHY_SAMPLES_ONLY.pdf")
 DimPlot(travis_healthy_data.subset,pt.size = 3.5)
@@ -193,7 +186,8 @@ HEALTHY.Female1.s2.clean <- RunPCA(HEALTHY.Female1.s2.clean)
 ```
 
 ```{r}
-#travis_NM_skin_scRNA <- readRDS(file="../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
+travis_NM_skin_scRNA <- readRDS(file="../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
+
 # RUN THIS ON BIG PURPLE 
 skin_reference.3 <- SCTransform(travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
     RunUMAP(dims = 1:40)
@@ -222,3 +216,4 @@ SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Sebocyte"), pt.size.fa
 
 SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Fibroblast-1"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
 ```
+

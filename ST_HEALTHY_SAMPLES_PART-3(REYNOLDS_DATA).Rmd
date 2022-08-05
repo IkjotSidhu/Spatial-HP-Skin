@@ -5,9 +5,15 @@ output: github_document
 
 # ST HEALTHY SAMPLES - PART 3
 
-## Integration with REYNOLDS et al 
+## Integration with REYNOLDS et al
 
 ## (DOI - <https://doi.org/10.1126/science.aba6500>).
+
+| FIGURE NO | LINK         |
+|-----------|--------------|
+| 2B        | [link](#2b)  |
+| 3A        | [link](#3a)  |
+| S3A       | [link](#s3a) |
 
 ### Load all of the required packages
 
@@ -30,7 +36,7 @@ source("SPATIAL_FUNCTIONS.R")
 
 (*replace this with zenodo repo link for final release)*
 
-```{r}
+```{r,eval=FALSE}
 load("../../scRNA_DATA/HEALTHY_SC_RNA_PROCESSED.RData")
 ```
 
@@ -38,41 +44,34 @@ load("../../scRNA_DATA/HEALTHY_SC_RNA_PROCESSED.RData")
 
 ### (Using final_clustering labels from the original manuscript)
 
-```{r}
+### Remove unlabeled cells (NAN) from the dataset
+
+```{r,eval=FALSE}
 healthy_skin.sc_data <- FindNeighbors(healthy_skin.sc_data, dims = 1:40)
 healthy_skin.sc_data <- FindClusters(healthy_skin.sc_data, verbose = FALSE,resolution = 1)
 healthy_skin.sc_data <- RunUMAP(healthy_skin.sc_data, dims = 1:40)
-```
 
-### Remove unlabeled cells (NAN) from the dataset
-
-```{r}
 Idents(healthy_skin.sc_data) <- "final_clustering"
 healthy_skin.sc_data <- subset(healthy_skin.sc_data,idents = c("nan"),invert=TRUE)
 ```
 
+###Import the processed data
+
 ```{r}
-healthy_skin.sc_data <- readRDS("../scRNA_DATA/healthy_skin.sc_data_HNF.RDS")
+healthy_skin.sc_data <- readRDS("../../scRNA_DATA/healthy_skin.sc_data_HNF.RDS")
 ```
 
-```{r}
-#pdf(width = 12,height=8,file = "UMAP_HANNIFA_DATA_HEALTHY_SAMPLES_ONLY.pdf")
-DimPlot(healthy_skin.sc_data,pt.size = 3.5,raster=FALSE)
-#dev.off()
-```
+<a id="s3a">
 
-```{r}
+### Supplementary Figure S3A
 
-Idents(healthy_skin.sc_data) <- "final_clustering"
-DimPlot(healthy_skin.sc_data,raster = FALSE)
+</a>
 
-pdf(file = "UMAP_ONLY_HEALTHY_SAMPLES_(HANNIFA_PAPER).pdf",width = 16,height=8)
-print(DimPlot(healthy_skin.sc_data_subset,pt.size = 1.2,shuffle = TRUE,raster=FALSE))
-dev.off()
+```{r,fig.height=10,fig.width=15}
+DimPlot(healthy_skin.sc_data,pt.size = 3.5,raster=FALSE,label = TRUE)
 ```
 
 ### Identify marker genes for the final_clustering labels
-
 ```{r,eval=FALSE}
 Idents(healthy_skin.sc_data) <- "final_clustering"
 hnf_skin_scRNA.markers <- FindAllMarkers(healthy_skin.sc_data,assay = "RNA",logfc.threshold = 0.25,max.cells.per.ident=400,only.pos = TRUE)
@@ -109,6 +108,8 @@ all.genes.scrna_and_spt <- unique(intersect(sc.genes,st.genes))
 
 ### Calculate cell type enrichment scores for all cell types in the dataset - healthy sample data only
 
+Top 300 marker genes per cell type / spatial region
+
 ```{r}
 MIA_results_PART_2 <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = hnf_skin_scRNA.markers,spatial.markers = filtered_spatial_markers)
 
@@ -118,14 +119,17 @@ is.na(E.data_PART_2) <- do.call(cbind,lapply(E.data_PART_2, is.infinite))
 pheatmap(E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
 ```
 
-### Immune cell types only
+### Figure 2B <a id="2b">
+
+### Immune cell types only (MIA Heatmap)
 
 ```{r}
 ## IMMUNE CELLS
-immune_only.E.data_PART_2 <- E.data_PART_2[,c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK")]
-pdf(file = "MIA_regions_(HANNIFA_PAPER)_IMMUNE_CELLS.pdf",width = 10,height = 5)
+immune_only.E.data_PART_2 <- E.data_PART_2[,c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK")] 
+immune_only.E.data_PART_2[is.na(immune_only.E.data_PART_2)] <- 0
+#pdf(file = "MIA_regions_(HANNIFA_PAPER)_IMMUNE_CELLS.pdf",width = 10,height = 5)
 print(pheatmap(immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal))
-dev.off()
+#dev.off()
 
 ```
 
@@ -133,9 +137,9 @@ dev.off()
 
 ```{r}
 non_immune_only.E.data_PART_2 <- E.data_PART_2 %>% dplyr::select(-c("DC1","DC2","Macro_1","Macro_2","moDC_1","moDC_2","moDC_3","MigDC","Mono","Inf_mono","ILC1_NK","ILC1_3","ILC2","Tc","Th","Treg","Mast_cell","Plasma","NK","nan"))
-pdf(file = "MIA_regions_(HANNIFA_PAPER)_NON_IMMUNE_CELLS.pdf",width = 10,height = 5)
+#pdf(file = "MIA_regions_(HANNIFA_PAPER)_NON_IMMUNE_CELLS.pdf",width = 10,height = 5)
 print(pheatmap(non_immune_only.E.data_PART_2,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal))
-dev.off()
+#dev.off()
 ```
 
 ## 

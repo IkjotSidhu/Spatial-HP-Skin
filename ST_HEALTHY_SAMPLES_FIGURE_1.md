@@ -1,7 +1,37 @@
-Healthy donors - Spatial Transcriptomics data analysis workflow
-================
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
 
-# R Notebook covering data generated from healthy samples for Figure 1, Supplementary figure 1 and 2.
+# Healthy donors - Spatial Transcriptomics data analysis workflow
+
+# ST HEALTHY SAMPLES - PART 1
+
+This notebook covers the basic to advanced analysis of ST (spatial
+transcriptomic) samples from healthy / normal human skin -
+
+-   Pre-processing
+
+-   Quality Control
+
+-   Clustering
+
+-   Dimensionality Reduction (UMAP)
+
+-   Batch Correction
+
+-   Marker Genes
+
+### TABLE OF CONTENTS
+
+| FIGURE NO | LINK         |
+|-----------|--------------|
+| 1B        | [link](#1b)  |
+| 1C        | [link](#1c)  |
+| 1D        | [link](#1d)  |
+| S2-C      | [link](#s2c) |
+| S2-D      | [link](#s2d) |
 
 ## Load required packages
 
@@ -198,10 +228,6 @@ source("SPATIAL_FUNCTIONS.R")
 
     ## 
 
-## CONTENTS
-
-[hlink](#1b)
-
 ### Import Healthy Samples
 
 (Raw Data stored in GEO repo: GSE202011)
@@ -369,7 +395,7 @@ while(i <= length(Healthy_Samples)){
 Original vignette
 (<https://satijalab.org/seurat/articles/integration_introduction.html>)
 
-REFERENCE- (<https://doi.org/10.1016/j.cell.2019.05.031>)
+Reference paper- (<https://doi.org/10.1016/j.cell.2019.05.031>)
 
 Each sample - replicate is treated as an individual batch to account for
 differences in sequencing depth between replicates and sample to sample
@@ -399,7 +425,7 @@ show_col(custom_colors)
 
 ![](ST_HEALTHY_SAMPLES_FIGURE_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
-### Finding marker genes for batch corrected healthy samples + plotting for top 10 marker genes per cluster heatmap
+### Finding marker genes for batch corrected healthy samples + plotting for top 8 marker genes per cluster heatmap
 
 ``` r
 new.skin.combined <- PrepSCTFindMarkers(new.skin.combined,assay = "SCT")
@@ -438,7 +464,7 @@ new.skin.combined.markers <- FindAllMarkers(new.skin.combined, only.pos = TRUE, 
 
 ``` r
 DefaultAssay(new.skin.combined) <- "SCT"
-top10 <- new.skin.combined.markers %>%
+top8 <- new.skin.combined.markers %>%
     dplyr::group_by(cluster) %>%
     dplyr::filter(p_val_adj<0.05) %>%
     top_n(n = 8, wt = avg_log2FC)
@@ -447,15 +473,19 @@ top10 <- new.skin.combined.markers %>%
 #dev.off()
 ```
 
+<a id="s2c"></a>
+
 ``` r
-DoHeatmap(new.skin.combined, features = top10$gene,assay = "SCT",group.colors = custom_colors) + NoLegend()
+DoHeatmap(new.skin.combined, features = top8$gene,assay = "SCT",group.colors = custom_colors) + NoLegend()
 ```
 
-    ## Warning in DoHeatmap(new.skin.combined, features = top10$gene, assay = "SCT", :
+    ## Warning in DoHeatmap(new.skin.combined, features = top8$gene, assay = "SCT", :
     ## The following features were omitted as they were not found in the scale.data
     ## slot for the SCT assay: HLA-E, S100P, SCGB1B2P, SCGB2A2, SCGB1D2, PIP
 
 ![](ST_HEALTHY_SAMPLES_FIGURE_1_files/figure-gfm/figure-s2-c-1.png)<!-- -->
+
+</a>
 
 ### Assign spatial region specific cluster ids
 
@@ -483,6 +513,8 @@ names(color.labels.anchor) <- new.cluster.ids
 
 #### FIGURE 1-C
 
+<a id="1c">
+
 ``` r
 pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_CLUSTERS_ONLY.pdf")
 DimPlot(new.skin.combined,cols = custom_colors,pt.size = 3.5)
@@ -498,6 +530,8 @@ DimPlot(new.skin.combined,cols = custom_colors,pt.size = 3.5)
 ```
 
 ![](ST_HEALTHY_SAMPLES_FIGURE_1_files/figure-gfm/figure-1c-1.png)<!-- -->
+
+</a>
 
 ### UMAP plot split by samples
 
@@ -535,7 +569,10 @@ SpatialDimPlot(new.skin.combined,images="HV2.S1.R2",cols = color.labels.anchor,p
 ```
 
 ![](ST_HEALTHY_SAMPLES_FIGURE_1_files/figure-gfm/figure-1b-1.png)<!-- -->
-</a> \### Generate Spatial plot for all samples
+
+</a>
+
+### Generate Spatial plot for all samples
 
 ``` r
 images <- Images(new.skin.combined) %>% as.vector()
@@ -560,6 +597,8 @@ for(i in seq(0,11)){
 
 ### UMI counts per cluster basis
 
+<a id="s2d">
+
 ``` r
 #VIOLIN PLOT FOR UMIs and SEURAT CLUSTERS
 #pdf(file = "VIOLIN_PLOT_UMIs_and_CLUSTERS_HEALTHY_SAMPLES.pdf",width = 16,height=12)
@@ -571,6 +610,8 @@ print(VlnPlot(new.skin.combined,group.by = "seurat_clusters",features = "nCount_
 ``` r
 #dev.off()
 ```
+
+</a>
 
 # LOG TRANSFORMED UMI COUNTS
 
@@ -604,7 +645,11 @@ for(x in clusters){
 }
 ```
 
-**FIGURE 1D** \## PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS
+## **FIGURE 1D**
+
+## PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS
+
+<a id="1d">
 
 ``` r
 Regions.df <- table(new.skin.combined@meta.data$Spatial.regions,new.skin.combined@meta.data$sample.id) %>% as.data.frame() %>% dplyr::rename(Spatial_Region=Var1,Sample=Var2) 
@@ -623,3 +668,5 @@ panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_co
 ``` r
 #dev.off()
 ```
+
+</a>

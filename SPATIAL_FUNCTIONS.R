@@ -5,6 +5,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(reticulate)
 
+
 st_filter_by_genes <- function(st.data,x){
   st.data <- subset(st.data, subset = nFeature_Spatial > x)
   pdf(file=paste(unique(st.data@meta.data$orig.ident),"_filtered_by",x,".pdf"),width = 10,height=12)
@@ -14,16 +15,16 @@ st_filter_by_genes <- function(st.data,x){
 }
 
 
-st_single_cell_integerate <- function(skin.list){
-  for (i in 1:length(skin.list)) {
-    skin.list[[i]] <- SCTransform(skin.list[[i]], verbose = FALSE,assay="Spatial")
+st_single_cell_integerate <- function(data.list){
+  for (i in 1:length(data.list)) {
+    data.list[[i]] <- SCTransform(data.list[[i]], verbose = FALSE,assay="Spatial")
   }
-  features <- SelectIntegrationFeatures(object.list = skin.list, nfeatures = 3000)
-  skin.list <- PrepSCTIntegration(object.list = skin.list, anchor.features = features)
-  skin.anchors <- FindIntegrationAnchors(object.list = skin.list, normalization.method = "SCT", 
+  features <- SelectIntegrationFeatures(object.list = data.list, nfeatures = 3000)
+  data.list <- PrepSCTIntegration(object.list = data.list, anchor.features = features)
+  data.anchors <- FindIntegrationAnchors(object.list = data.list, normalization.method = "SCT", 
                                          anchor.features = features)
-  skin.combined.sct <- IntegrateData(anchorset = skin.anchors, normalization.method = "SCT")
-  return(skin.combined.sct)
+  data.combined.sct <- IntegrateData(anchorset = data.anchors, normalization.method = "SCT")
+  return(data.combined.sct)
 }
 
 
@@ -70,20 +71,21 @@ st_filter_spots <- function(st.data,x){
   return(st.data)
 }
 
-st_combine <- function(skin.list,ndim,res){
-  for (i in 1:length(skin.list)) {
-    skin.list[[i]] <- SCTransform(skin.list[[i]], verbose = FALSE,assay="Spatial")
+st_combine <- function(data.list,ndim,res,seed=100){
+  set.seed(seed)
+  for (i in 1:length(data.list)) {
+    data.list[[i]] <- SCTransform(data.list[[i]], verbose = FALSE,assay="Spatial")
   }
-  features <- SelectIntegrationFeatures(object.list = skin.list, nfeatures = 3000)
-  skin.list <- PrepSCTIntegration(object.list = skin.list, anchor.features = features)
-  skin.anchors <- FindIntegrationAnchors(object.list = skin.list, normalization.method = "SCT", 
+  features <- SelectIntegrationFeatures(object.list = data.list, nfeatures = 3000)
+  data.list <- PrepSCTIntegration(object.list = data.list, anchor.features = features)
+  data.anchors <- FindIntegrationAnchors(object.list = data.list, normalization.method = "SCT", 
                                          anchor.features = features)
-  skin.combined.sct <- IntegrateData(anchorset = skin.anchors, normalization.method = "SCT")
-  skin.combined.sct <- RunPCA(skin.combined.sct, verbose = FALSE)
-  skin.combined.sct <- FindNeighbors(skin.combined.sct, dims = 1:ndim)
-  skin.combined.sct <- FindClusters(skin.combined.sct, verbose = FALSE,resolution = res)
-  skin.combined.sct <- RunUMAP(skin.combined.sct, dims = 1:ndim)
-  return(skin.combined.sct)
+  data.combined.sct <- IntegrateData(anchorset = data.anchors, normalization.method = "SCT")
+  data.combined.sct <- RunPCA(data.combined.sct, verbose = FALSE)
+  data.combined.sct <- FindNeighbors(data.combined.sct, dims = 1:ndim)
+  data.combined.sct <- FindClusters(data.combined.sct, verbose = FALSE,resolution = res)
+  data.combined.sct <- RunUMAP(data.combined.sct, dims = 1:ndim)
+  return(data.combined.sct)
 }
 
 MIA <- function(stlist,sclist,total=14705){
@@ -157,14 +159,15 @@ KEGG_PATHWAYS <- function(MARKERS,OUTPUT){
 Cell_types <- c("Fibroblast-1","Fibroblast-2","HairFollicle","Keratinocyte-1","Keratinocyte-2","Keratinocyte-3","Keratinocyte-4","Keratinocyte-5","Sebocyte","VSMC-1","Melanocyte","Lymphatic")
 Cell_types <- c("T cell-1","T cell-2","T cell-3","B cell","Myeloid-1","Myeloid-2","Langerhans")
 
-st_enrichment <- function(sc.data,st.data,Cell_types){
+st_enrichment <- function(sc.data,st.data,Cell_types,seed=100){
+  set.seed(seed)
   st.data <- st_filter_by_genes(st.data = st.data,x = 200)
   st.data <- SCTransform(st.data,assay = "Spatial")
   st.data <- RunPCA(st.data, assay = "SCT", verbose = FALSE)
   
-  skin_reference <- SCTransform(sc.data, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% RunUMAP(dims = 1:20)
-  anchors <- FindTransferAnchors(reference = skin_reference, query = st.data, normalization.method = "SCT")
-  predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference$final_clustering, prediction.assay = TRUE, weight.reduction = st.data[["pca"]],dims = 1:20)
+  data_reference <- SCTransform(sc.data, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% RunUMAP(dims = 1:20)
+  anchors <- FindTransferAnchors(reference = data_reference, query = st.data, normalization.method = "SCT")
+  predictions.assay <- TransferData(anchorset = anchors, refdata = data_reference$final_clustering, prediction.assay = TRUE, weight.reduction = st.data[["pca"]],dims = 1:20)
   st.data[["predictions_sc_data"]] <- predictions.assay
   
   DefaultAssay(st.data) <- "predictions_sc_data"
@@ -182,9 +185,9 @@ st_enrichment_v2 <- function(sc.data,st.data,Cell_types){
   st.data <- SCTransform(st.data,assay = "Spatial")
   st.data <- RunPCA(st.data, assay = "SCT", verbose = FALSE)
   
-  skin_reference <- SCTransform(sc.data, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% RunUMAP(dims = 1:20)
-  anchors <- FindTransferAnchors(reference = skin_reference, query = st.data, normalization.method = "SCT")
-  predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference$final_clustering, prediction.assay = TRUE, weight.reduction = st.data[["pca"]],dims = 1:20)
+  data_reference <- SCTransform(sc.data, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% RunUMAP(dims = 1:20)
+  anchors <- FindTransferAnchors(reference = data_reference, query = st.data, normalization.method = "SCT")
+  predictions.assay <- TransferData(anchorset = anchors, refdata = data_reference$final_clustering, prediction.assay = TRUE, weight.reduction = st.data[["pca"]],dims = 1:20)
   st.data[["predictions_sc_data"]] <- predictions.assay
   
   DefaultAssay(st.data) <- "predictions_sc_data"

@@ -1,0 +1,936 @@
+---
+title: "R Notebook"
+output: github_document
+---
+
+## PSO + PSA + NORMAL SKIN COMBINED ANALYSIS - PART 1
+
+## Table of content
+
+| FIGURE NO | LINK          |
+|-----------|---------------|
+| S4A       | [link](#s34a) |
+| S4C       | [link](#s4c)  |
+| S6        | [link](#s6)   |
+
+## (Split into lesional, non-lesional and healthy skin)
+
+### LOAD ALL PACKAGES
+
+```{r}
+library(tidyverse)
+library(Seurat)
+library(cowplot)
+library(ggsci)
+source("SPATIAL_FUNCTIONS.R")
+```
+
+### Loading the Healthy samples
+
+Outlier spots were identified and the corresponding barcodes were isolated using loupe browser.
+
+Outlier spots were removed preprocessing.
+
+```{r}
+## HEALTHY SAMPLES
+## HEALTHY MALE SKIN 1 & 2
+HEALTHY.Male.s1 <- Load10X_Spatial(data.dir ="../../FOURTH_RUN/SAMPLE A1/",slice="ST-HM-1-R1")
+HEALTHY.Male.s2 <- Load10X_Spatial(data.dir ="../../SEVENTH RUN/ST-HM-1/",slice="ST-HM-1-R2")
+
+## HEALTHY FEMALE SKIN 1 & 2 (FROM THE SAME DONOR)
+HEALTHY.Female1.s1 <- Load10X_Spatial(data.dir ="../../FOURTH_RUN/SAMPLE B1/",slice="ST-HF-1-R1")
+HEALTHY.Female1.s2 <- Load10X_Spatial(data.dir ="../../FIFTH_RUN/SAMPLE D1/",slice="ST-HF-1-R2")
+HEALTHY.Female1.s3 <- Load10X_Spatial(data.dir ="../../SEVENTH RUN/ST-HF-1/",slice="ST-HF-1-R3")
+
+## HEALTHY FEMALE
+HEALTHY.Female2.s1 <- Load10X_Spatial(data.dir ="../../SEVENTH RUN/ST-HF-2E/",slice="ST-HF-2-R1")
+HEALTHY.Female2.s2 <- Load10X_Spatial(data.dir ="../../SEVENTH RUN/ST-HF-2F/",slice="ST-HF-2-R2")
+
+```
+
+```{r}
+#REMOVE SPOTS
+remove.spots <- read.csv(file="../../CLOUPE_FILES/FOURTH_RUN/A1/DELETE.csv")
+subset_spots <- Cells(HEALTHY.Male.s1)[which((!(rownames(HEALTHY.Male.s1@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Male.s1.clean <- subset(HEALTHY.Male.s1,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../CLOUPE_FILES/SEVENTH_RUN/HF-1-SP/remove.csv")
+subset_spots <- Cells(HEALTHY.Female1.s3)[which((!(rownames(HEALTHY.Female1.s3@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female1.s3.clean <- subset(HEALTHY.Female1.s3,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../CLOUPE_FILES/SEVENTH_RUN/HF-2-SE/Remove.csv")
+subset_spots <- Cells(HEALTHY.Female2.s1)[which((!(rownames(HEALTHY.Female2.s1@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female2.s1.clean <- subset(HEALTHY.Female2.s1,cells=subset_spots)
+
+
+remove.spots <- read.csv(file="../../CLOUPE_FILES/SEVENTH_RUN/HF-2-SP/Remove.csv")
+subset_spots <- Cells(HEALTHY.Female2.s2)[which((!(rownames(HEALTHY.Female2.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female2.s2.clean <- subset(HEALTHY.Female2.s2,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../CLOUPE_FILES/SEVENTH_RUN/HM-SP-2/remove.csv")
+subset_spots <- Cells(HEALTHY.Male.s2)[which((!(rownames(HEALTHY.Male.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Male.s2.clean <- subset(HEALTHY.Male.s2,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../FIFTH_RUN/SAMPLE D1/REMOVE.csv")
+subset_spots <- Cells(HEALTHY.Female1.s2)[which((!(rownames(HEALTHY.Female1.s2@meta.data) %in% remove.spots$Barcode)))]
+HEALTHY.Female1.s2.clean <- subset(HEALTHY.Female1.s2,cells=subset_spots)
+```
+
+### META-DATA FOR ST DATA
+
+Meta-data includes the following:-
+
+1.  Disease Status: Split into Healthy, Non-Lesional and Lesional skin.
+
+2.  Specific (Disease) Status: Includes Disease Status + Disease severity
+
+3.  Batch / Sequencing Run
+
+4.  Sample ID
+
+5.  Original Identity / Full Sample ID
+
+6.  PASI (Psoriasis Area and Severity Index) score
+
+7.  Disease Severity : Based on PASI score range, split into Mild and Moderate-Severe
+
+8.  Biopsy Site: Original location of the skin biopsy site
+
+### ADD METADATA FOR HEALTHY SAMPLES
+
+```{r}
+HEALTHY.Male.s1.clean$DISEASE_STATUS <- "Healthy skin" 
+HEALTHY.Male.s2.clean$DISEASE_STATUS <- "Healthy skin"
+
+HEALTHY.Female1.s1$DISEASE_STATUS <- "Healthy skin"
+HEALTHY.Female1.s2.clean$DISEASE_STATUS <- "Healthy skin"
+HEALTHY.Female1.s3.clean$DISEASE_STATUS <- "Healthy skin"
+
+HEALTHY.Female2.s1.clean$DISEASE_STATUS <- "Healthy skin"
+HEALTHY.Female2.s2.clean$DISEASE_STATUS <- "Healthy skin"
+
+HEALTHY.Male.s1.clean$SITE <- "Back" 
+HEALTHY.Male.s2.clean$SITE <- "Back"
+
+HEALTHY.Female1.s1$SITE <- "Arm"
+HEALTHY.Female1.s2.clean$SITE <- "Arm"
+HEALTHY.Female1.s3.clean$SITE <- "Back"
+
+HEALTHY.Female2.s1.clean$SITE <- "Arm"
+HEALTHY.Female2.s2.clean$SITE <- "Back"
+```
+
+```{r}
+HEALTHY.Male.s1.clean$SPECIFIC_STATUS <- "Healthy skin" 
+HEALTHY.Male.s2.clean$SPECIFIC_STATUS <- "Healthy skin"
+
+HEALTHY.Female1.s1$SPECIFIC_STATUS <- "Healthy skin"
+HEALTHY.Female1.s2.clean$SPECIFIC_STATUS <- "Healthy skin"
+HEALTHY.Female1.s3.clean$SPECIFIC_STATUS<- "Healthy skin"
+
+HEALTHY.Female2.s1.clean$SPECIFIC_STATUS <- "Healthy skin"
+HEALTHY.Female2.s2.clean$SPECIFIC_STATUS <- "Healthy skin"
+
+```
+
+```{r}
+# BATCH INFORMATION
+HEALTHY.Male.s1.clean$Batch <- "Batch 4" 
+HEALTHY.Male.s2.clean$Batch <- "Batch 7"
+
+HEALTHY.Female1.s1$Batch <- "Batch 4"
+HEALTHY.Female1.s2.clean$Batch <- "Batch 4"
+HEALTHY.Female1.s3.clean$Batch<- "Batch 7"
+
+HEALTHY.Female2.s1.clean$Batch <- "Batch 7"
+HEALTHY.Female2.s2.clean$Batch <- "Batch 7"
+
+```
+
+```{r}
+HEALTHY.Male.s1.clean$orig.ident <- "Healthy Volunteer 1 - TRUNK R1" 
+HEALTHY.Male.s2.clean$orig.ident <- "Healthy Volunteer 1 - TRUNK R2"
+
+HEALTHY.Female1.s1$orig.ident <- "Healthy Volunteer 2 - FA R1"
+HEALTHY.Female1.s2.clean$orig.ident <- "Healthy Volunteer 2 - FA R2"
+HEALTHY.Female1.s3.clean$orig.ident <- "Healthy Volunteer 2 - TRUNK"
+
+HEALTHY.Female2.s1.clean$orig.ident <- "Healthy Volunteer 3 - FA R1"
+HEALTHY.Female2.s2.clean$orig.ident <- "Healthy Volunteer 3 - TRUNK"
+```
+
+```{r}
+#SAMPLE IDS
+HEALTHY.Male.s1.clean$sample.id<- "HV1_S1_R1" 
+HEALTHY.Male.s2.clean$sample.id<- "HV1_S1_R2"
+
+HEALTHY.Female1.s1$sample.id <- "HV2_S1_R1"
+HEALTHY.Female1.s2.clean$sample.id <- "HV2_S1_R2"
+HEALTHY.Female1.s3.clean$sample.id <- "HV2_S2"
+
+HEALTHY.Female2.s1.clean$sample.id <- "HV3_S1"
+HEALTHY.Female2.s2.clean$sample.id <- "HV3_S2"
+```
+
+```{r}
+HEALTHY.Male.s1.clean$PASI <- 0 
+HEALTHY.Male.s2.clean$PASI <- 0
+
+HEALTHY.Female1.s1$PASI <-0
+HEALTHY.Female1.s2.clean$PASI <- 0
+HEALTHY.Female1.s3.clean$PASI <- 0
+
+HEALTHY.Female2.s1.clean$PASI <- 0
+HEALTHY.Female2.s2.clean$PASI <- 0
+```
+
+```{r}
+HEALTHY.Male.s1.clean$Disease_severity <- "NA"
+HEALTHY.Male.s2.clean$Disease_severity <- "NA"
+
+HEALTHY.Female1.s1$Disease_severity <- "NA"
+HEALTHY.Female1.s2.clean$Disease_severity <- "NA"
+HEALTHY.Female1.s3.clean$Disease_severity <-"NA"
+
+HEALTHY.Female2.s1.clean$Disease_severity <- "NA"
+HEALTHY.Female2.s2.clean$Disease_severity <- "NA"
+```
+
+### POOL ALL HEALTHY SAMPLES
+
+```{r}
+Healthy_Samples <- c(HEALTHY.Male.s1.clean,HEALTHY.Male.s2.clean,HEALTHY.Female1.s1,HEALTHY.Female1.s2.clean,HEALTHY.Female1.s3.clean,HEALTHY.Female2.s1.clean,HEALTHY.Female2.s2.clean)
+```
+
+```{r}
+i <- 1
+while(i <= length(Healthy_Samples)){
+  filtered_data <- st_filter_by_genes(st.data = Healthy_Samples[[i]],x = 200)
+  filtered_data <- SCTransform(filtered_data,assay = "Spatial")
+  Healthy_Samples[[i]] <- filtered_data
+  i <- i+1
+}
+```
+
+### IMPORT PSORIATIC SAMPLES - BY SEQUENCING RUN / BATCH + REMOVE OUTLIER SPOTS
+
+(Outlier spots were identified and the corresponding barcodes were isolated using loupe browser.)
+
+### BATCH 1 + BATCH 2
+
+```{r}
+## PATIENT 1
+##LESIONAL SKIN  - PSO PATIENT 1
+LES.A1 <- Load10X_Spatial(data.dir ="../../FIRST_RUN/SAMPLE_A1/",slice="ST_13_L_Batch_1")
+
+## NORMAL SKIN - PSO PATIENT 1
+NON_LES.A1 <- Load10X_Spatial(data.dir ="../../FIRST_RUN/SAMPLE_B1/",slice="ST_13_NL_Batch_1")
+
+## PATIENT 2
+## LESIONAL SKIN - PSA PATIENT 1 (Psoriatic Arthritis patient)
+LES.B1 <- Load10X_Spatial(data.dir ="../../FIRST_RUN/SAMPLE_C1/",slice="ST_16_L_Batch_1")
+
+NON_LES.B1 <- Load10X_Spatial(data.dir ="../../FIRST_RUN/SAMPLE_D1/",slice="ST_16_NL_Batch_1")
+
+## PATIENT 3
+## LESIONAL SKIN - PSO PATIENT 2
+LES.C1 <- Load10X_Spatial(data.dir ="../../SECOND_RUN/SAMPLE_A1_BATCH_2/",slice="ST_14_L_R1_Batch_2")
+
+## NORMAL SKIN - PSO PATIENT 2
+NON_LES.C1 <- Load10X_Spatial(data.dir ="../../SECOND_RUN/SAMPLE_B1_BATCH_2/",slice="ST_14_NL_Batch_2")
+
+## PATIENT 4
+## LESIONAL SKIN - PSO PATIENT 3 
+LES.D1 <- Load10X_Spatial(data.dir ="../../SECOND_RUN/SAMPLE_C1_BATCH_2/",slice="ST_17_L_Batch_2")
+
+## NON-LESIONAL SKIN - PSO PATIENT 3
+NON_LES.D1 <- Load10X_Spatial(data.dir ="../../SECOND_RUN/SAMPLE_D1_BATCH_2/",slice="ST_17_NL_Batch_2")
+```
+
+```{r}
+## SUBSET SPOTS
+# IMPORT IDS
+
+LES.A1.ids <- read.csv(file = "../BARCODES/LES_A1_ids.csv")
+NON_LES.A1.ids <- read.csv(file = "../BARCODES/NORMAL_A1_ids.csv")
+LES.B1.ids <- read.csv(file = "../BARCODES/LES_B1_ids.csv")
+NON_LES.B1.ids <-read.csv(file = "../BARCODES/NORMAL_B1_ids.csv")
+
+LES.A1.clean <- subset(LES.A1,cells=LES.A1.ids$Barcode)
+NON_LES.A1.clean <- subset(NON_LES.A1,cells=NON_LES.A1.ids$Barcode)
+LES.B1.clean <- subset(LES.B1,cells=LES.B1.ids$Barcode)
+NON_LES.B1.clean <- subset(NON_LES.B1,cells=NON_LES.B1.ids$Barcode)
+```
+
+```{r}
+SpatialDimPlot(LES.A1.clean)
+SpatialDimPlot(NON_LES.A1.clean)
+SpatialDimPlot(LES.B1.clean)
+SpatialDimPlot(NON_LES.B1.clean)
+```
+
+### BATCH 3
+
+```{r}
+## PSA PATIENT 2
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_P2_B3 <- Load10X_Spatial(data.dir ="../../THIRD_RUN/SAMPLE_1/",slice="ST_15_L_R1_Batch_3")
+
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+NON_LES.PSA_P2_B3 <- Load10X_Spatial(data.dir ="../../THIRD_RUN/SAMPLE_2/",slice="ST_15_NL_Batch_3")
+
+## PATIENT 2
+## LESIONAL SKIN - PATIENT 2 (Psoriatic Arthritis patient)
+TREATED_LES.PSA_P2_B3 <- Load10X_Spatial(data.dir ="../../THIRD_RUN/SAMPLE_3/",slice="Treated_PSA_Lesional_Patient_2_Batch_3")
+
+TREATED_NON_LES.PSA_P2_B3 <- Load10X_Spatial(data.dir ="../../THIRD_RUN/SAMPLE_4/",slice="Treated_PSA_Non_Lesional_Patient_2_Batch_3")
+```
+
+### BATCH 4
+
+```{r}
+## PSA PATIENT 3
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_B4 <- Load10X_Spatial(data.dir ="../../FOURTH_RUN/SAMPLE C1/",slice="ST_18_L_R1_Batch_4")
+
+##
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+NON_LES.PSA_B4 <- Load10X_Spatial(data.dir ="../../FOURTH_RUN/SAMPLE D1/",slice="ST_18_NL_Batch_4")
+
+```
+
+```{r}
+SpatialDimPlot(LES.PSA_B4)
+SpatialDimPlot(NON_LES.PSA_B4)
+
+remove.spots <- read.csv(file="../../FOURTH_RUN/SAMPLE C1/remove.csv")
+subset_spots <- Cells(LES.PSA_B4)[which((!(rownames(LES.PSA_B4@meta.data) %in% remove.spots$Barcode)))]
+LES.PSA_B4.clean <- subset(LES.PSA_B4,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../FOURTH_RUN/SAMPLE D1/remove.csv")
+subset_spots <- Cells(NON_LES.PSA_B4)[which((!(rownames(NON_LES.PSA_B4@meta.data) %in% remove.spots$Barcode)))]
+NON_LES.PSA_B4.clean <- subset(NON_LES.PSA_B4,cells=subset_spots)
+
+```
+
+### BATCH 5
+
+```{r}
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_P2_B5 <- Load10X_Spatial(data.dir ="../../FIFTH_RUN/SAMPLE A1/",slice="ST_14_L_R2_Batch_5")
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_P2_B5 <- Load10X_Spatial(data.dir ="../../FIFTH_RUN/SAMPLE B1/",slice="ST_15_L_R2_Batch_5")
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_P3_B5 <- Load10X_Spatial(data.dir ="../../FIFTH_RUN/SAMPLE C1/",slice="ST_18_L_R2_Batch_5")
+```
+
+```{r}
+SpatialDimPlot(LES.PSO_P2_B5)
+SpatialDimPlot(LES.PSA_P3_B5)
+
+remove.spots <- read.csv(file="../../FIFTH_RUN/SAMPLE A1/remove.csv")
+subset_spots <- Cells(LES.PSO_P2_B5)[which((!(rownames(LES.PSO_P2_B5@meta.data) %in% remove.spots$Barcode)))]
+LES.PSO_P2_B5.clean <- subset(LES.PSO_P2_B5,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../FIFTH_RUN/SAMPLE C1/remove.csv")
+subset_spots <- Cells(LES.PSA_P3_B5)[which((!(rownames(LES.PSA_P3_B5@meta.data) %in% remove.spots$Barcode)))]
+LES.PSA_P3_B5.clean <- subset(LES.PSA_P3_B5,cells=subset_spots)
+
+```
+
+```{r}
+SpatialDimPlot(LES.PSO_P2_B5.clean)
+SpatialDimPlot(LES.PSA_P3_B5.clean)
+```
+
+### BATCH 6
+
+```{r}
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_S1_B6 <- Load10X_Spatial(data.dir ="../../SIXTH_RUN/SAMPLE_A1/",slice="ST_20_L_Batch_6")
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+NON_LES.PSO_S1_B6 <- Load10X_Spatial(data.dir ="../../SIXTH_RUN/SAMPLE_B1/",slice="ST_20_NL_Batch_6")
+
+## LESIONAL SKIN - (Psoriatic patient)
+LES.PSO_S2_B6 <- Load10X_Spatial(data.dir ="../../SIXTH_RUN/SAMPLE_C1/",slice="ST_21_L_Batch_6")
+
+## NON-LESIONAL SKIN - (Psoriatic patient)
+NON_LES.PSO_S2_B6 <- Load10X_Spatial(data.dir ="../../SIXTH_RUN/SAMPLE_D1/",slice="ST_21_NL_Batch_6")
+```
+
+```{r}
+SpatialDimPlot(LES.PSO_S1_B6)
+SpatialDimPlot(NON_LES.PSO_S1_B6)
+SpatialDimPlot(LES.PSO_S2_B6)
+SpatialDimPlot(NON_LES.PSO_S2_B6)
+
+remove.spots <- read.csv(file="../../SIXTH_RUN/SAMPLE_A1/remove.csv")
+subset_spots <- Cells(LES.PSO_S1_B6)[which((!(rownames(LES.PSO_S1_B6@meta.data) %in% remove.spots$Barcode)))]
+LES.PSO_S1_B6.clean <- subset(LES.PSO_S1_B6,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../SIXTH_RUN/SAMPLE_B1/remove.csv")
+subset_spots <- Cells(NON_LES.PSO_S1_B6)[which((!(rownames(NON_LES.PSO_S1_B6@meta.data) %in% remove.spots$Barcode)))]
+NON_LES.PSO_S1_B6.clean <- subset(NON_LES.PSO_S1_B6,cells=subset_spots)
+
+```
+
+### BATCH 8
+
+```{r}
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSO_B8_ROCHESTER_PATIENT_1 <- Load10X_Spatial(data.dir ="../../EIGHTH_RUN/SAMPLE_A1/",slice="PSO_Lesional_Patient1_Batch_8_ROCHESTER_SAMPLE")
+
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_B8_ROCHESTER_PATIENT_2 <- Load10X_Spatial(data.dir ="../../EIGHTH_RUN/SAMPLE_B1/",slice="PSA_Lesional_Patient2_Batch_8_ROCHESTER_SAMPLE")
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_B8 <- Load10X_Spatial(data.dir ="../../EIGHTH_RUN/SAMPLE_C1/",slice="ST_22L_Batch_8")
+
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+NON_LES.PSA_B8 <- Load10X_Spatial(data.dir ="../../EIGHTH_RUN/SAMPLE_D1/",slice="ST_22NL_Batch_8")
+```
+
+```{r}
+remove.spots <- read.csv(file="../../EIGHTH_RUN/SAMPLE_B1/remove.csv")
+subset_spots <- Cells(LES.PSA_B8_ROCHESTER_PATIENT_2)[which((!(rownames(LES.PSA_B8_ROCHESTER_PATIENT_2@meta.data) %in% remove.spots$Barcode)))]
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean <- subset(LES.PSA_B8_ROCHESTER_PATIENT_2,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../EIGHTH_RUN/SAMPLE_C1/remove.csv")
+subset_spots <- Cells(LES.PSA_B8)[which((!(rownames(LES.PSA_B8@meta.data) %in% remove.spots$Barcode)))]
+LES.PSA_B8.clean <- subset(LES.PSA_B8,cells=subset_spots)
+
+remove.spots <- read.csv(file="../../EIGHTH_RUN/SAMPLE_D1/remove.csv")
+subset_spots <- Cells(NON_LES.PSA_B8)[which((!(rownames(NON_LES.PSA_B8@meta.data) %in% remove.spots$Barcode)))]
+NON_LES.PSA_B8.clean <- subset(NON_LES.PSA_B8,cells=subset_spots)
+
+```
+
+```{r}
+SpatialDimPlot(LES.PSA_B8_ROCHESTER_PATIENT_2.clean)
+SpatialDimPlot(LES.PSA_B8.clean)
+SpatialDimPlot(NON_LES.PSA_B8.clean)
+```
+
+```{r}
+# PATIENT 3
+remove.p3.les <- read.csv(file="../../CLOUPE_FILES/LES.C1/REMOVE.csv")
+subset_spots <- Cells(LES.C1)[which((!(rownames(LES.C1@meta.data) %in% remove.p3.les$Barcode)))]
+LES.C1.clean <- subset(LES.C1,cells=subset_spots)
+
+# PATIENT 3
+remove.p3.normal <- read.csv(file="../../CLOUPE_FILES/NORMAL.C1/delete.csv")
+subset_spots <- Cells(NON_LES.C1)[which((!(rownames(NON_LES.C1@meta.data) %in% remove.p3.normal$Barcode)))]
+NON_LES.C1.clean <- subset(NON_LES.C1,cells=subset_spots)
+```
+
+```{r}
+# PATIENT 4
+remove.p4.les <- read.csv(file="../../CLOUPE_FILES/LES.D1/remove.csv")
+subset_spots <- Cells(LES.D1)[which((!(rownames(LES.D1@meta.data) %in% remove.p4.les$Barcode)))]
+LES.D1.clean <- subset(LES.D1,cells=subset_spots)
+
+remove.p4.NON_LES <- read.csv(file="../../CLOUPE_FILES/NORMAL.D1/remove.csv")
+subset_spots <- Cells(NON_LES.D1)[which((!(rownames(NON_LES.D1@meta.data) %in% remove.p4.NON_LES$Barcode)))]
+NON_LES.D1.clean <- subset(NON_LES.D1,cells=subset_spots)
+```
+
+### ADD METADATA FOR PSORIATIC SAMPLES
+
+```{r}
+## Assign sample names
+## Refer to metadata sheet for reference.
+
+# BATCH 1
+
+LES.A1.clean$orig.ident <- "PSO Lesional Skin Patient 1"
+NON_LES.A1.clean$orig.ident <- "PSO Non-Lesional Skin Patient 1"
+LES.B1.clean$orig.ident <- "PSA Lesional Skin Patient 1"
+NON_LES.B1.clean$orig.ident <- "PSA Non-Lesional Skin Patient 1"
+
+# BATCH 2
+LES.C1.clean$orig.ident <- "PSO Lesional Skin Patient 2 R1"
+NON_LES.C1.clean$orig.ident <- "PSO Non-Lesional Skin Patient 2"
+LES.D1.clean$orig.ident <- "PSO Lesional Skin Patient 3"
+NON_LES.D1.clean$orig.ident <- "PSO Non-Lesional Skin Patient 3"
+
+# BATCH 3
+LES.PSA_P2_B3$orig.ident <- "PSA Lesional Patient 2 R1"
+NON_LES.PSA_P2_B3$orig.ident <- "PSA Non-Lesional Skin Patient 2"
+
+# BATCH 4
+LES.PSA_B4.clean$orig.ident <-"PSA Lesional Patient 3 R1"
+NON_LES.PSA_B4.clean$orig.ident <- "PSA Non-Lesional Patient 3"
+
+# BATCH 5
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_P2_B5.clean$orig.ident <- "PSO Lesional Patient 2 R2"
+
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_P3_B5.clean$orig.ident <- "PSA Lesional Patient 3 R2"
+LES.PSA_P2_B5$orig.ident <- "PSA Lesional Patient 2 R2"
+
+#BATCH 6
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_S1_B6.clean$orig.ident <- "PSO Lesional Patient 4"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+NON_LES.PSO_S1_B6.clean$orig.ident <- "PSO Non-Lesional Patient 4"
+
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_S2_B6$orig.ident <- "PSO Lesional Patient 5"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+NON_LES.PSO_S2_B6$orig.ident <- "PSO Non-Lesional Patient 5"
+
+# BATCH 8
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_B8_ROCHESTER_PATIENT_1$orig.ident <- "PSO Lesional Patient1 - ROCHESTER SAMPLE"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$orig.ident <- "PSA Lesional Patient2 - ROCHESTER SAMPLE"
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_B8.clean$orig.ident <- "PSA Lesional Patient 4"
+
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+NON_LES.PSA_B8.clean$orig.ident <- "PSA Non-Lesional Patient 4"
+
+```
+
+```{r}
+## Assign SAMPLE IDS
+## Refer to metadata sheet for reference.
+
+# BATCH 1
+LES.A1.clean$sample.id <- "PSO_LES_P1"
+NON_LES.A1.clean$sample.id <- "PSO_NON_LES_P1"
+LES.B1.clean$sample.id <- "PSA_LES_P1"
+NON_LES.B1.clean$sample.id <- "PSA_NON_LES_P1"
+
+# BATCH 2
+LES.C1.clean$sample.id <- "PSO_LES_P2_R1"
+NON_LES.C1.clean$sample.id <- "PSO_NON_LES_P2"
+LES.D1.clean$sample.id <- "PSO_LES_P3"
+NON_LES.D1.clean$sample.id <- "PSO_NON_LES_P3"
+
+
+# BATCH 3
+LES.PSA_P2_B3$sample.id <- "PSA_LES_P2_R1"
+NON_LES.PSA_P2_B3$sample.id <- "PSA_NON_LES_P2"
+
+# BATCH 4
+LES.PSA_B4.clean$sample.id <-"PSA_LES_P3_R1"
+NON_LES.PSA_B4.clean$sample.id <- "PSA_NON_LES_P3"
+
+# BATCH 5
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_P2_B5.clean$sample.id <- "PSO_LES_P2_R2"
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_P3_B5.clean$sample.id <- "PSA_LES_P3_R2"
+## NON-LESIONAL SKIN - (Psoriasis patient)
+LES.PSA_P2_B5$sample.id <- "PSA_LES_P2_R2"
+
+
+#BATCH 6
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_S1_B6.clean$sample.id <- "PSO_LES_P4"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+NON_LES.PSO_S1_B6.clean$sample.id <- "PSO_NON_LES_P4"
+
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_S2_B6$sample.id <- "PSO_LES_P5"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+NON_LES.PSO_S2_B6$sample.id <- "PSO_NON_LES_P5"
+
+# BATCH 8
+## LESIONAL SKIN - (Psoriasis patient)
+LES.PSO_B8_ROCHESTER_PATIENT_1$sample.id <- "PSO_LES_P6"
+
+## NON-LESIONAL SKIN - (Psoriasis patient)
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$sample.id <- "PSA_LES_P6"
+
+## LESIONAL SKIN - (Psoriatic Arthritis patient)
+LES.PSA_B8.clean$sample.id <- "PSA_LES_P4"
+
+## NON-LESIONAL SKIN - (Psoriatic Arthritis patient)
+NON_LES.PSA_B8.clean$sample.id <- "PSA_NON_LES_P4"
+```
+
+```{r}
+## BATCH INFORMATION
+LES.A1.clean$Batch <- "Batch 1"
+NON_LES.A1.clean$Batch <- "Batch 1"
+LES.B1.clean$Batch <- "Batch 1"
+NON_LES.B1.clean$Batch <- "Batch 1"
+
+LES.C1.clean$Batch <- "Batch 2"
+NON_LES.C1.clean$Batch <- "Batch 2"
+LES.D1.clean$Batch <- "Batch 2"
+NON_LES.D1.clean$Batch <- "Batch 2"
+
+
+LES.PSA_P2_B3$Batch <- "Batch 3"
+NON_LES.PSA_P2_B3$Batch <- "Batch 3"
+
+
+LES.PSA_B4.clean$Batch <-"Batch 4"
+NON_LES.PSA_B4.clean$Batch <- "Batch 4"
+
+
+LES.PSO_P2_B5.clean$Batch <- "Batch 5"
+
+LES.PSA_P2_B5$Batch <- "Batch 5"
+
+LES.PSA_P3_B5.clean$Batch <- "Batch 5"
+
+LES.PSO_S1_B6.clean$Batch <- "Batch 6"
+
+NON_LES.PSO_S1_B6.clean$Batch <- "Batch 6"
+
+LES.PSO_S2_B6$Batch <- "Batch 6"
+
+NON_LES.PSO_S2_B6$Batch <- "Batch 6"
+
+LES.PSO_B8_ROCHESTER_PATIENT_1$Batch <- "Batch 8"
+
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$Batch <- "Batch 8"
+
+LES.PSA_B8.clean$Batch <- "Batch 8"
+
+NON_LES.PSA_B8.clean$Batch <- "Batch 8"
+
+```
+
+```{r}
+
+## NON-LESIONAL SKIN - Psoriasis only
+NON_LES.A1.clean$SPECIFIC_STATUS <- "Non-Lesional PSO"
+NON_LES.C1.clean$SPECIFIC_STATUS <- "Non-Lesional PSO"
+NON_LES.D1.clean$SPECIFIC_STATUS <- "Non-Lesional PSO"
+NON_LES.PSO_S1_B6.clean$SPECIFIC_STATUS <- "Non-Lesional PSO"
+NON_LES.PSO_S2_B6$SPECIFIC_STATUS <- "Non-Lesional PSO"
+
+## LESIONAL - Psoriasis only
+LES.A1.clean$SPECIFIC_STATUS <- "Lesional PSO"
+LES.C1.clean$SPECIFIC_STATUS <- "Lesional PSO"
+LES.D1.clean$SPECIFIC_STATUS <- "Lesional PSO"
+LES.PSO_P2_B5.clean$SPECIFIC_STATUS <- "Lesional PSO"
+LES.PSO_S1_B6.clean$SPECIFIC_STATUS <- "Lesional PSO"
+LES.PSO_S2_B6$SPECIFIC_STATUS <- "Lesional PSO"
+LES.PSO_B8_ROCHESTER_PATIENT_1$SPECIFIC_STATUS <- "Lesional PSO"
+
+##NON-LESIONAL SKIN - Psoriatic Arthritis
+NON_LES.B1.clean$SPECIFIC_STATUS <- "Non-Lesional PSA"
+NON_LES.PSA_P2_B3$SPECIFIC_STATUS <- "Non-Lesional PSA"
+NON_LES.PSA_B4.clean$SPECIFIC_STATUS <- "Non-Lesional PSA"
+NON_LES.PSA_B8.clean$SPECIFIC_STATUS <- "Non-Lesional PSA"
+
+## LESIONAL SKIN - Psoriatic Arthritis
+LES.B1.clean$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_P2_B3$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_B4.clean$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_P3_B5.clean$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_P2_B5$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$SPECIFIC_STATUS <- "Lesional PSA"
+LES.PSA_B8.clean$SPECIFIC_STATUS <- "Lesional PSA"
+
+```
+
+```{r}
+# PSORIATIC STATUS - LESIONAL OR NON-LESIONAL
+
+## NON-LESIONAL SKIN 
+NON_LES.A1.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.C1.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.D1.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.PSO_S1_B6.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.PSO_S2_B6$DISEASE_STATUS <- "Non-Lesional"
+
+NON_LES.B1.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.PSA_P2_B3$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.PSA_B4.clean$DISEASE_STATUS <- "Non-Lesional"
+NON_LES.PSA_B8.clean$DISEASE_STATUS <- "Non-Lesional"
+
+## LESIONAL 
+LES.A1.clean$DISEASE_STATUS <- "Lesional"
+LES.C1.clean$DISEASE_STATUS <- "Lesional"
+LES.D1.clean$DISEASE_STATUS <- "Lesional"
+LES.PSO_P2_B5.clean$DISEASE_STATUS <- "Lesional"
+LES.PSO_S1_B6.clean$DISEASE_STATUS <- "Lesional"
+LES.PSO_S2_B6$DISEASE_STATUS <- "Lesional"
+
+LES.B1.clean$DISEASE_STATUS <- "Lesional"
+LES.PSA_P2_B3$DISEASE_STATUS <- "Lesional"
+LES.PSA_B4.clean$DISEASE_STATUS <- "Lesional"
+LES.PSA_P2_B5$DISEASE_STATUS <- "Lesional"
+LES.PSA_P3_B5.clean$DISEASE_STATUS <- "Lesional"
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$DISEASE_STATUS <- "Lesional"
+LES.PSO_B8_ROCHESTER_PATIENT_1$DISEASE_STATUS <- "Lesional"
+LES.PSA_B8.clean$DISEASE_STATUS <- "Lesional"
+
+
+
+```
+
+```{r}
+## PASI SCORES
+## NON-LESIONAL SKIN 
+NON_LES.A1.clean$PASI <- 11.2
+NON_LES.C1.clean$PASI <- 1.8
+NON_LES.D1.clean$PASI <- 6
+NON_LES.PSO_S1_B6.clean$PASI <- 32
+NON_LES.PSO_S2_B6$PASI <- 18
+
+NON_LES.B1.clean$PASI <- 28.8
+NON_LES.PSA_P2_B3$PASI <- 5
+NON_LES.PSA_B4.clean$PASI <- 13.2
+NON_LES.PSA_B8.clean$PASI <- 8.4
+
+## LESIONAL 
+LES.A1.clean$PASI <- 11.2
+LES.C1.clean$PASI <- 1.8
+LES.D1.clean$PASI <- 6
+LES.PSO_P2_B5.clean$PASI <- 1.8
+LES.PSO_S1_B6.clean$PASI <- 32
+LES.PSO_S2_B6$PASI <- 18
+LES.PSA_P2_B5$PASI <- 5
+
+LES.B1.clean$PASI <- 28.8
+LES.PSA_P2_B3$PASI <- 5
+LES.PSA_B4.clean$PASI <- 13.2
+LES.PSA_P3_B5.clean$PASI <- 13.2
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$PASI <- 4.8
+LES.PSO_B8_ROCHESTER_PATIENT_1$PASI <- 10.1
+LES.PSA_B8.clean$PASI <- 8.4
+
+```
+
+```{r}
+## PASI SCORES
+## NON-LESIONAL SKIN 
+NON_LES.A1.clean$Disease_severity <- "Mild"
+NON_LES.C1.clean$Disease_severity <- "Mild"
+NON_LES.D1.clean$Disease_severity <- "Mild"
+NON_LES.PSO_S1_B6.clean$Disease_severity <- "Moderate-Severe"
+NON_LES.PSO_S2_B6$Disease_severity <- "Moderate-Severe"
+
+NON_LES.B1.clean$Disease_severity <- "Moderate-Severe"
+NON_LES.PSA_P2_B3$Disease_severity <-"Mild"
+NON_LES.PSA_B4.clean$Disease_severity <- "Moderate-Severe"
+NON_LES.PSA_B8.clean$Disease_severity <- "Mild"
+
+## LESIONAL 
+LES.A1.clean$Disease_severity <- "Mild"
+LES.C1.clean$Disease_severity <- "Mild"
+LES.D1.clean$Disease_severity <- "Mild"
+LES.PSO_P2_B5.clean$Disease_severity <- "Mild"
+LES.PSO_S1_B6.clean$Disease_severity <- "Moderate-Severe"
+LES.PSO_S2_B6$Disease_severity <- "Moderate-Severe"
+
+LES.B1.clean$Disease_severity <- "Moderate-Severe"
+LES.PSA_P2_B3$Disease_severity <- "Mild"
+LES.PSA_B4.clean$Disease_severity <- "Moderate-Severe"
+LES.PSA_P3_B5.clean$Disease_severity <- "Moderate-Severe"
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$Disease_severity <- "Mild"
+LES.PSO_B8_ROCHESTER_PATIENT_1$Disease_severity <- "Moderate-Severe"
+LES.PSA_B8.clean$Disease_severity <- "Mild"
+LES.PSA_P2_B5$Disease_severity <- "Mild"
+```
+
+```{r}
+## BODY SITE FOR BIOPSY
+## NON-LESIONAL SKIN 
+NON_LES.A1.clean$SITE <- "Back"
+NON_LES.C1.clean$SITE <- "Arm"
+NON_LES.D1.clean$SITE <- "Back"
+NON_LES.PSO_S1_B6.clean$SITE <- "Back"
+NON_LES.PSO_S2_B6$SITE <- "Back"
+
+NON_LES.B1.clean$SITE <- "Trunk"
+NON_LES.PSA_P2_B3$SITE <- "Thigh"
+NON_LES.PSA_B4.clean$SITE <- "Back"
+NON_LES.PSA_B8.clean$SITE <- "Leg"
+
+## LESIONAL 
+LES.A1.clean$SITE <- "Back"
+LES.C1.clean$SITE <- "Forearm"
+LES.D1.clean$SITE <- "Back"
+LES.PSO_P2_B5.clean$SITE <- "Arm"
+LES.PSO_S1_B6.clean$SITE <- "Back"
+LES.PSO_S2_B6$SITE <- "Arm"
+
+LES.B1.clean$SITE <- "Back"
+LES.PSA_P2_B3$SITE <- "Thigh"
+LES.PSA_B4.clean$SITE <- "Back"
+LES.PSA_P3_B5.clean$SITE <- "Back"
+LES.PSA_B8_ROCHESTER_PATIENT_2.clean$SITE <- "NA"
+LES.PSO_B8_ROCHESTER_PATIENT_1$SITE <- "NA"
+LES.PSA_B8.clean$SITE <- "Leg"
+
+```
+
+### POOL NON-LESIONAL AND LESIONAL SAMPLES
+
+```{r}
+NON_LES_SAMPLES <- c(NON_LES.A1.clean,NON_LES.C1.clean,NON_LES.D1.clean,NON_LES.PSO_S1_B6.clean,NON_LES.PSO_S2_B6,NON_LES.B1.clean,NON_LES.PSA_P2_B3,NON_LES.PSA_B4.clean,NON_LES.PSA_B8.clean)
+
+## LESIONAL 
+LES_SAMPLES <- c(LES.A1.clean,LES.C1.clean,LES.D1.clean,LES.PSO_P2_B5.clean,LES.PSO_S1_B6.clean,LES.PSO_S2_B6,LES.B1.clean,LES.PSA_P2_B3,LES.PSA_B4.clean,LES.PSA_P2_B5,LES.PSA_P3_B5.clean,LES.PSA_B8_ROCHESTER_PATIENT_2.clean,LES.PSO_B8_ROCHESTER_PATIENT_1,LES.PSA_B8.clean)
+```
+
+#SPATIAL PLOTS (WITHOUT QC FILTERING)
+
+```{r,eval=FALSE}
+for (x in NON_LES_SAMPLES){
+  st_plot(x)
+}
+for (x in LES_SAMPLES){
+  st_plot(x)
+}
+```
+
+### STANDARD QC SCATTER PLOTS WITH - UMIs vs Genes
+
+```{r,eval=FALSE}
+for (x in NON_LES_SAMPLES){
+  st_scatter_QC(x)
+}
+for (x in LES_SAMPLES){
+  st_scatter_QC(x)
+}
+```
+
+### PERFORMING STANDARD QC FILTERING (REMOVE SPOTS WITH LESS THAN 200 GENES)
+
+```{r}
+i <- 1
+while(i <= length(Healthy_Samples)){
+  filtered_data <- st_filter_by_genes(st.data = Healthy_Samples[[i]],x = 200)
+  filtered_data <- SCTransform(filtered_data,assay = "Spatial")
+  Healthy_Samples[[i]] <- filtered_data
+  i <- i+1
+}
+
+i <- 1
+while(i <= length(NON_LES_SAMPLES)){
+  filtered_data <- st_filter_by_genes(st.data = NON_LES_SAMPLES[[i]],x = 200)
+  filtered_data <- SCTransform(filtered_data,assay = "Spatial")
+  NON_LES_SAMPLES[[i]] <- filtered_data
+  i <- i+1
+}
+
+i <- 1
+while(i <= length(LES_SAMPLES)){
+  filtered_data <- st_filter_by_genes(st.data = LES_SAMPLES[[i]],x = 200)
+  filtered_data <- SCTransform(filtered_data,assay = "Spatial")
+  LES_SAMPLES[[i]] <- filtered_data
+  i <- i+1
+}
+```
+
+### BATCH ALIGNED DATA (USING ANCHOR INTEGERATION FROM SEURAT)
+
+```{r,eval=FALSE}
+## ALL SAMPLES - BATCH ALIGNED
+All_Samples <- c(LES_SAMPLES,NON_LES_SAMPLES,Healthy_Samples)
+save(All_Samples,file="ALL_SPATIAL_SAMPLES.Rdata")
+```
+
+### DO NOT RUN THIS LOCALLY
+
+### ONLY FOR SAVING PARAMETERS
+
+```{r,eval=FALSE}
+load("ALL_SPATIAL_SAMPLES.Rdata")
+all.skin.combined <- st_combine(All_Samples,ndim = 40,res =0.8)
+```
+
+```{r,eval=FALSE}
+## ADDING CLUSTER LABELS TO BATCH ALIGNED DATA
+cluster.ids_v1 <- c("0 - Fibroblasts","1 - Mixed","2 – Keratinocytes (basal and suprabasal)","3 - Keratinocytes (basal and suprabasal)","4 - Macrophages, fibroblasts","5 - Smooth muscle cells","6 - Macrophages, fibroblasts","7 - Endothelial cells, smooth muscle cells","8 - Suprabasal keratinocytes","9 - Melanocytes","10 - Smooth muscle cells","11 - Suprabasal keratinocytes","12 - Mixed","13 - Melanocytes","14 - Adipose")
+names(cluster.ids_v1) <- levels(all.skin.combined)
+all.skin.combined <- RenameIdents(all.skin.combined, cluster.ids_v1)
+all.skin.combined <- StashIdent(all.skin.combined, save.name = "Spatial.regions_V1")
+```
+
+```{r,eval=FALSE}
+saveRDS(all.skin.combined,"ST_DATA_ANCHOR_ALIGNED.RDS")
+```
+
+```{r}
+all.skin.combined <- readRDS("ST_DATA_ANCHOR_ALIGNED.RDS")
+```
+
+```{r}
+#Define color scheme
+color.labels.anchor <- c("0 - Fibroblasts"="#8cccf0","1 - Mixed"="#e0bfb6","2 – Keratinocytes (basal and suprabasal)"="#af97c8","3 - Keratinocytes (basal and suprabasal)"="#ed2224","4 - Macrophages, fibroblasts"="#5570b6","5 - Smooth muscle cells"="#025a48","6 - Macrophages, fibroblasts"="#04A584","7 - Endothelial cells, smooth muscle cells"="#8c5b2c","8 - Suprabasal keratinocytes"="#c356a0","9 - Melanocytes"="#cd863e","10 - Smooth muscle cells"="#24b34b","11 - Suprabasal keratinocytes"="#692c89","12 - Mixed"="#c1cdcd","13 - Melanocytes"="#D79E64","14 - Adipose"="#ffc81c")
+```
+
+## FIGURE S4A
+
+###- UMAP after anchor batch correction <a id="s4a">
+
+```{r,fig.height=8,fig.width=12}
+DimPlot(all.skin.combined,pt.size = 3.5,shuffle = TRUE,cols = color.labels.anchor,group.by = "Spatial.regions_V1")
+```
+
+</a>
+
+## FIGURE SUPPLEMENTARY S4C
+
+### Spatial Dim Plot - NON-LESIONAL SKIN SAMPLE (ST 21 NL) and LESIONAL SKIN SAMPLE (ST 22 L) <a id="s4c"></a>
+
+```{r}
+SpatialDimPlot(all.skin.combined,images = c("ST_21_NL_Batch_6"),cols =color.labels.anchor ,pt.size.factor = 2.5)
+SpatialDimPlot(all.skin.combined,images = c("ST_22L_Batch_8"),cols =color.labels.anchor,pt.size.factor = 2.5)
+```
+
+```{r,fig.height=10,fig.width=15}
+VlnPlot(all.skin.combined,features =  "nFeature_Spatial") + scale_fill_manual(values = color.labels.anchor)
+
+VlnPlot(all.skin.combined,features =  "nCount_Spatial") + scale_fill_manual(values =color.labels.anchor)
+```
+
+```{r,fig.height=22,fig.width=15}
+Idents(all.skin.combined) <- "Spatial.regions_V1"
+all.skin.combined <- PrepSCTFindMarkers(all.skin.combined)
+all.skin.combined.markers <- FindAllMarkers(all.skin.combined, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT",) %>% filter(p_val_adj<0.05)
+DefaultAssay(all.skin.combined) <- "SCT"
+top10 <- all.skin.combined.markers %>%
+    filter(gene %in% rownames(all.skin.combined@assays$SCT@scale.data)) %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC)
+```
+
+## FIGURE SUPPLEMENTARY (S6)
+
+### HEATMAP -showing top 10 marker genes per cluster 
+
+<a id="s6">
+
+```{R}
+DoHeatmap(all.skin.combined, features = top10$gene,assay = "SCT",group.colors = color.labels.anchor,angle = 90) + NoLegend()
+```
+
+</a>
+
+### PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS
+
+```{r,fig.height=20,fig.width=7}
+seurat_clusters.df <- table(all.skin.combined@meta.data$Spatial.regions_V1,all.skin.combined@meta.data$DISEASE_STATUS) %>% as.data.frame() %>%
+  dplyr::rename(seurat_clusters=Var1,Group=Var2) 
+
+black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+
+ggplot(seurat_clusters.df,aes(x=Group,y=Freq,fill=seurat_clusters)) + geom_bar(stat="identity",position="fill") + ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks)) + scale_fill_manual(values=color.labels.anchor)
+
+```

@@ -5,7 +5,7 @@ output: github_document
 
 # ST HEALTHY SAMPLES - PART 4
 
-## Integration with Sullivan et al 
+## Integration with Sullivan et al
 
 ## (DOI- <https://doi.org/10.1038/s41590-021-00922-4>)
 
@@ -103,13 +103,13 @@ percent_mt = round(percent_mt * 100, digits = 3)
 combined_lean_samples.obj = AddMetaData(combined_lean_samples.obj, metadata = percent_mt, col.name = "percent.mt")
 ```
 
-### General QC plot 
+### General QC plot
 
 ```{r,eval=FALSE}
 VlnPlot(combined_lean_samples.obj, features = c("nFeature_RNA", "nCount_RNA","percent.mt"), ncol = 3)
 ```
 
-### Filter samples using same QC parameters as the orignal paper
+### Filter samples using same QC parameters as the original paper
 
 ```{r,eval=FALSE}
 combined_lean_samples.obj <- subset(combined_lean_samples.obj, subset = nFeature_RNA > 500 & percent.mt < 25)
@@ -159,7 +159,8 @@ combined_lean_samples.obj <- readRDS("../../scRNA ADIPOCYTES/LEAN_SAMPLES_SCRNA.
 ### Plot the UMAP (added cell type labels based on marker genes)
 
 ```{r}
-DimPlot(combined_lean_samples.obj)
+Idents(combined_lean_samples.obj) <- "seurat_clusters"
+DimPlot(combined_lean_samples.obj,label = TRUE)
 ```
 
 ```{r}
@@ -191,10 +192,15 @@ DoHeatmap(combined_lean_samples.obj, features = top10$gene,assay = "RNA") + NoLe
 ### Label cell types of interest
 
 ```{r}
-cluster.ids <- c("Preadipocytes","Preadipocytes","APC","3","4","5","6","7","8","9","10","11","Endothelial Cells","Smooth Muscle","14","15","16","17","18")
+Idents(combined_lean_samples.obj) <- "seurat_clusters"
+cluster.ids <- c("Preadipocytes","Preadipocytes","2","APCs","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18")
 names(cluster.ids) <- levels(combined_lean_samples.obj)
 combined_lean_samples.obj <- RenameIdents(combined_lean_samples.obj, cluster.ids)
 combined_lean_samples.obj$CellType <- Idents(combined_lean_samples.obj)
+```
+
+```{r}
+DimPlot(combined_lean_samples.obj,label = TRUE)
 ```
 
 ### Load the Healthy ST dataset
@@ -229,29 +235,15 @@ col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
 ```
 
 ```{r}
-spatial_markers.without_align <- FindAllMarkers(healthy_skin.merge,assay = "Spatial")
-```
-
-```{r}
 filtered_single_cell_markers <- combined_lean_samples.MARKERS %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
 filtered_spatial_markers <- new.skin.combined.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
 MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = filtered_single_cell_markers,spatial.markers = filtered_spatial_markers)
 
 E.data <- MIA_results %>% column_to_rownames("cluster")
 E.data <- E.data[,order(colnames(E.data))]
-pdf(file = "MIA_regions_SULLIVAN_DATA.pdf",width = 10,height = 4)
+#pdf(file = "MIA_regions_SULLIVAN_DATA.pdf",width = 10,height = 4)
 pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
-dev.off()
-```
-
-```{r}
-filtered_single_cell_markers <- combined_lean_samples.MARKERS %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
-filtered_spatial_markers <- healthy_skin_merged.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
-MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = filtered_single_cell_markers,spatial.markers = filtered_spatial_markers)
-
-E.data <- MIA_results %>% column_to_rownames("cluster")
-E.data <- E.data[,order(colnames(E.data))]
-pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
+#dev.off()
 ```
 
 ```{r}

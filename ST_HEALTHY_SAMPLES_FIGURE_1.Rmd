@@ -39,6 +39,7 @@ library(RColorBrewer)
 library(pheatmap)
 library(scales)
 library(ggsci)
+library(harmony)
 ```
 
 ## Import functions from the custom R script
@@ -200,7 +201,7 @@ custom_colors <- c("#B4DFFC","#6EAB3D","#FFD700","#A020F0","#FFA500","#AEDD3C","
 show_col(custom_colors)
 ```
 
-### Finding marker genes for batch corrected healthy samples + plotting for top 8 marker genes per cluster heatmap
+### Finding marker genes for batch corrected healthy samples + plotting for top 8 marker genes per cluster heat-map
 
 ```{r}
 new.skin.combined <- PrepSCTFindMarkers(new.skin.combined,assay = "SCT")
@@ -380,3 +381,98 @@ panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_co
 ```
 
 </a>
+
+### Harmony batch correction
+
+```{r}
+for (i in 1:length(Healthy_Samples)) {
+    Healthy_Samples[[i]] <- SCTransform(Healthy_Samples[[i]], verbose = FALSE,assay="Spatial")
+}
+all.variable.features <- c()
+for(x in Healthy_Samples){
+  x <- FindVariableFeatures(x)
+  vf <- VariableFeatures(x)
+  all.variable.features <- c(all.variable.features,vf) 
+}
+
+```
+
+### Version 1: Batch correction after correcting SCT counts.
+
+```{r}
+healthy_skin.merge <- merge(x=Healthy_Samples[[1]],y=Healthy_Samples[-1])
+
+VariableFeatures(healthy_skin.merge) <- all.variable.features %>% unique()
+DefaultAssay(healthy_skin.merge) <- "SCT"
+healthy_skin.merge <- PrepSCTFindMarkers(healthy_skin.merge)
+healthy_skin.merge <- RunPCA(healthy_skin.merge)
+#healthy_skin.merge <- SCTransform(healthy_skin.merge,assay = "Spatial")
+all_healthy_samples.hm.sct <- RunHarmony(healthy_skin.merge,assay.use = "SCT",project.dim = FALSE,group.by.vars = "sample.id")
+```
+
+```{r}
+all_healthy_samples.hm.sct.v1 <- all_healthy_samples.hm.sct %>% 
+    RunUMAP(reduction = "harmony", dims = 1:40) %>% 
+    FindNeighbors(reduction = "harmony", dims = 1:40) %>% 
+    FindClusters(resolution = 0.6) %>% 
+    identity()
+```
+
+```{r}
+pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
+DimPlot(all_healthy_samples.hm.sct.v1,cols = custom_colors,pt.size = 3.5)
+dev.off()
+```
+
+```{r}
+all_healthy_samples.hm.sct.v1 <- PrepSCTFindMarkers(all_healthy_samples.hm.sct.v1,assay = "SCT")
+Idents(all_healthy_samples.hm.sct.v1) <- "seurat_clusters"
+all_healthy_samples.hm.sct.v1.markers <- FindAllMarkers(all_healthy_samples.hm.sct.v1, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT")
+DefaultAssay(all_healthy_samples.hm.sct.v1) <- "SCT"
+top8 <- all_healthy_samples.hm.sct.v1.markers %>%
+    dplyr::group_by(cluster) %>%
+    dplyr::filter(p_val_adj<0.05) %>%
+    top_n(n = 8, wt = avg_log2FC)
+pdf(width = 20,height=15,file = "HEATMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
+print(DoHeatmap(all_healthy_samples.hm.sct.v1, features = top8$gene,assay = "SCT",group.colors = custom_colors) + NoLegend())
+dev.off()
+```
+
+```{r}
+healthy_skin.merge <- merge(x=Healthy_Samples[[1]],y=Healthy_Samples[-1])
+healthy_skin.merge <- SCTransform(healthy_skin.merge,assay = "Spatial")
+
+DefaultAssay(healthy_skin.merge) <- "SCT"
+healthy_skin.merge <- RunPCA(healthy_skin.merge)
+
+all_healthy_samples.hm.sct.v2 <- RunHarmony(healthy_skin.merge,assay.use = "SCT",project.dim = FALSE,group.by.vars = "sample.id")
+```
+
+```{r}
+all_healthy_samples.hm.sct.v2 <- all_healthy_samples.hm.sct.v2 %>% 
+    RunUMAP(reduction = "harmony", dims = 1:40) %>% 
+    FindNeighbors(reduction = "harmony", dims = 1:40) %>% 
+    FindClusters(resolution = 0.35) %>% 
+    identity()
+
+```
+
+```{r}
+pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLESall_(HM_VER_2).pdf")
+DimPlot(all_healthy_samples.hm.sct.v2,cols = custom_colors,pt.size = 3.5)
+dev.off()
+```
+
+```{r}
+all_healthy_samples.hm.sct.v2 <- PrepSCTFindMarkers(all_healthy_samples.hm.sct.v2,assay = "SCT")
+Idents(all_healthy_samples.hm.sct.v2) <- "seurat_clusters"
+all_healthy_samples.hm.sct.v2.markers <- FindAllMarkers(all_healthy_samples.hm.sct.v2, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT")
+DefaultAssay(all_healthy_samples.hm.sct.v2) <- "SCT"
+top8 <- all_healthy_samples.hm.sct.v2.markers %>%
+    dplyr::group_by(cluster) %>%
+    dplyr::filter(p_val_adj<0.05) %>%
+    top_n(n = 8, wt = avg_log2FC)
+pdf(width = 20,height=15,file = "HEATMAP_HEALTHY_SAMPLES_(HM_VER_2).pdf")
+print(DoHeatmap(all_healthy_samples.hm.sct.v2, features = top8$gene,assay = "SCT",group.colors = custom_colors) + NoLegend())
+dev.off()
+```

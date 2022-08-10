@@ -52,14 +52,13 @@ Each notebook link will take you to the notebook with necessary code, please sel
 | S2-B      |                                                                                                |                                                                            |
 | S2-C      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md) | Heat-map showing top 8 marker genes per cluster (Healthy sample data only) |
 | S2-D      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md) | UMI counts                                                                 |
-|           |                                                                                                |                                                                            |
 
 ### SUPPLEMENTARY FIGURE 3
 
-| FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION |
-|-----------|-------------------------------------------------------------------------------------------------------------|-------------|
-| S3-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   |             |
-| S3-B      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) |             |
+| FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION                                                |
+|-----------|-------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| S3-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   | UMAP - healthy skin with scRNA dataset 1 (Hughes et al.)   |
+| S3-B      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) | UMAP - healthy skin with scRNA dataset 2 (Reynolds et al.) |
 
 ### SUPPLEMENTARY FIGURE 4
 

@@ -5,7 +5,7 @@ output: github_document
 
 # ST HEALTHY SAMPLES - PART 2
 
-## Integration with TRAVIS HUGHES et al
+## Integration with TRAVIS HUGHES et al.
 
 ## (DOI - <https://doi.org/10.1016/j.immuni.2020.09.015>).
 

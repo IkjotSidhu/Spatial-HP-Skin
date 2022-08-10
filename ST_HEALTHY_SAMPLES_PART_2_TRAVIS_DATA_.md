@@ -9,6 +9,13 @@ TRAVIS HUGHES et al single cell- healthy skin subset
 
 ### Load all of the required packages
 
+| FIGURE NO | LINK         |
+|-----------|--------------|
+| 2B        | [link](#2b)  |
+| 3A        | [link](#3a)  |
+| S3A       | [link](#s3a) |
+| 1E        | [link](#1e)  |
+
 ``` r
 library(tidyverse)
 ```
@@ -353,6 +360,8 @@ library(pheatmap)
 col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
 ```
 
+<a id="2b">
+
 ``` r
 MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = filtered_single_cell.markers,spatial.markers = filtered_spatial_markers)
 
@@ -363,9 +372,13 @@ pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = co
 
 ![](ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA__files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
+</a>
+
 ## Figure - 3A
 
 ### Immune cell types
+
+<a id="3a">
 
 ``` r
 immune_only.E.data <- E.data[,c("T cell-1","T cell-2","T cell-3","Myeloid-1","Langerhans","Mast-1","Mast-2")]
@@ -378,6 +391,8 @@ pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=1
 ``` r
 #dev.off()
 ```
+
+</a>
 
 ### Strucutural cell types
 
@@ -412,6 +427,8 @@ cols <- SpatialColors(n = 100)
 ```
 
 ## Figure -1E
+
+<a id="1e">
 
 ``` r
 Cell_types <- c("Fibroblast-1","HairFollicle","Keratinocyte-5","Keratinocyte-3","Sebocyte","VSMC-1","Melanocyte")
@@ -455,11 +472,13 @@ for (x in Cell_types){
 
 ![](ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA__files/figure-gfm/unnamed-chunk-22-6.png)<!-- -->![](ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA__files/figure-gfm/unnamed-chunk-22-7.png)<!-- -->
 
+</a>
+
 ### Overall cell frequencies in healthy subset data
 
 ``` r
 cell.counts <- as.data.frame(table(travis_NM_skin_scRNA@meta.data$Specific_CellType))
-write.csv(cell.counts,file="../../TRAVIS_scRNA_DATA/CELL_COUNTS_TRAVIS_HEALTHY_SKIN_DATA.csv")
+#write.csv(cell.counts,file="../../TRAVIS_scRNA_DATA/CELL_COUNTS_TRAVIS_HEALTHY_SKIN_DATA.csv")
 ```
 
 ### Filtered out cell types with less than 50 cells
@@ -476,9 +495,11 @@ DimPlot(travis_healthy_data.subset,pt.size = 2.5)
 
 ### Supplementary Figure - S3A
 
+<a id="s3a">
+
 ``` r
 #pdf(width = 12,height=8,file = "UMAP_TRAVIS_DATA_HEALTHY_SAMPLES_ONLY.pdf")
-DimPlot(travis_healthy_data.subset,pt.size = 3.5)
+DimPlot(travis_healthy_data.subset,pt.size = 3.5,group.by = "CellType")
 ```
 
 ![](ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA__files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
@@ -486,6 +507,8 @@ DimPlot(travis_healthy_data.subset,pt.size = 3.5)
 ``` r
 #dev.off()
 ```
+
+</a>
 
 ### Data for Venn diagram - Figure 1F
 

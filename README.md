@@ -1,7 +1,3 @@
----
----
----
-
 # Spatial-HP-Skin
 
 This repo will cover all of the code linked to **Castillo et al.**

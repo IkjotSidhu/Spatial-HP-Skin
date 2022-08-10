@@ -20,7 +20,6 @@ Each notebook link will take you to the notebook with necessary code, please sel
 
 ### FIGURE 1
 
-<<<<<<< HEAD
 | FIGURE NO | NOTEBOOK LINK                                                                                                | DESCRIPTION                                                                      |
 |-----------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
 | 1B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | Spatial Plot - Healthy sample with cluster labels                                |

@@ -182,12 +182,11 @@ top10 <- skin_data.hm.sct.markers %>%
     top_n(n = 10, wt = avg_log2FC)
 ```
 
-<a id="s5">
 
 ## FIGURE SUPPLEMENTARY S5 - 
 
 ### HEATMAP showing top marker genes after Harmony batch correction
-
+<a id="s5">
 ```{r,fig.height=20,fig.width=14}
 DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels,angle=90) + NoLegend()
 ```
@@ -201,12 +200,10 @@ seurat_clusters.df.v2 <- table(skin_data.hm.sct@active.ident,skin_data.hm.sct@me
   dplyr::rename(Cluster_id=Var1,Group=Var2,Sample_id=Var3) %>% filter(Freq!=0)  %>% group_by(Sample_id)%>% mutate(Fraction=Freq*100/sum(Freq)) %>% mutate(SUM_OF_FRACTIONS=sum(Fraction)) 
 ```
 
-<a id="3c">
-
 ## FIGURE 3C -
 
 ### PERCENTAGE COMPOSITION PLOT
-
+<a id="3c">
 ```{r,fig.height=20,fig.width=7}
 black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
 brks <- c(0, 0.25, 0.5, 0.75, 1)
@@ -219,8 +216,8 @@ panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_co
 
 ### FIGURE S7B -
 
-### (1) UMIs per cluster<a id="s7b">
-
+### (1) UMIs per cluster
+<a id="s7b">
 ### (2) Number of genes expressed per cluster
 
 ```{r}
@@ -228,5 +225,4 @@ VlnPlot(skin_data.hm.sct,features =  "nFeature_Spatial") + scale_fill_manual(val
 
 VlnPlot(skin_data.hm.sct,features =  "nCount_Spatial") + scale_fill_manual(values = color.labels)
 ```
-
 </a>

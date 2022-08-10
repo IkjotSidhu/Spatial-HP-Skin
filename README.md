@@ -25,8 +25,8 @@ Each notebook link will take you to the notebook with necessary code, please sel
 | 1B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | Spatial Plot - Healthy sample with cluster labels                                |
 | 1C        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | UMAP (Healthy samples only) - with spatial regions labels                        |
 | 1D        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | Percentage composition (Healthy samples only)                                    |
-| 1E        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2(TRAVIS_DATA).md)    | Seurat Integeration (scRNA + ST data) showing cell type enrichment               |
-| 1G        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2(TRAVIS_DATA).md)    | MIA - healthy skin with dataset 1 (Hughes et al.) - Structural cell types only   |
+| 1E        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)    | Seurat Integeration (scRNA + ST data) showing cell type enrichment               |
+| 1G        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)    | MIA - healthy skin with dataset 1 (Hughes et al.) - Structural cell types only   |
 | 1H        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md)  | MIA - healthy skin with dataset 2 (Reynolds et al.) - Structural cell types only |
 | 1I        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART-4(SULLIVAN_DATA).Rmd) | MIA - healthy skin with dataset 3 (Sullivan et al.) - APCs and Preadiplocytes    |
 
@@ -34,7 +34,7 @@ Each notebook link will take you to the notebook with necessary code, please sel
 
 | FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION                                                                  |
 |-----------|-------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| 2A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2(TRAVIS_DATA).md)   | MIA - healthy skin with dataset 1 (Hughes et al.) - Immune cell types only   |
+| 2A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   | MIA - healthy skin with dataset 1 (Hughes et al.) - Immune cell types only   |
 | 2B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) | MIA - healthy skin with dataset 2 (Reynolds et al.) - Immune cell types only |
 
 ### FIGURE 3
@@ -58,7 +58,7 @@ Each notebook link will take you to the notebook with necessary code, please sel
 
 | FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION |
 |-----------|-------------------------------------------------------------------------------------------------------------|-------------|
-| S3-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2(TRAVIS_DATA).md)   |             |
+| S3-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   |             |
 | S3-B      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) |             |
 
 ### SUPPLEMENTARY FIGURE 4

@@ -3,10 +3,21 @@ title: "TRAVIS HUGHES et al single cell- healthy skin subset"
 output: github_document
 ---
 
-## ST HEALTHY SAMPLES
-# Integeration with TRAVIS HUGHES et al.
+# ST HEALTHY SAMPLES - PART 2
 
-Load all of the required packages
+## Integration with TRAVIS HUGHES et al
+
+## (DOI - <https://doi.org/10.1016/j.immuni.2020.09.015>).
+
+### Load all of the required packages
+
+| FIGURE NO | LINK         |
+|-----------|--------------|
+| 2B        | [link](#2b)  |
+| 3A        | [link](#3a)  |
+| S3A       | [link](#s3a) |
+| 1E        | [link](#1e)  |
+
 ```{r}
 library(tidyverse)
 library(Seurat)
@@ -16,42 +27,50 @@ library(pheatmap)
 library(scales)
 ```
 
-# Import functions from the custom R script
+### Import functions from the custom R script
+
 ```{r}
 source("SPATIAL_FUNCTIONS.R")
 ```
 
-## LOAD ST HEALTHY SKIN DATA
+### Load Seurat object with healthy samples.
+
+(*replace this with zenodo repo link for final release)*
+
 ```{r}
-load(file = "HEALTHY_SKIN_SAMPLES_ST.RData")
+new.skin.combined <- readRDS("HEALTHY_SKIN_SAMPLES_ST.RDS")
 ```
 
-## SINGLE CELL DATA FROM TRAVIS PAPER
-```{r}
+### Load Seurat object + meta-data for scRNA data from Travis et al
+
+(*replace this with zenodo repo link for final release)*
+
+```{r,eval=FALSE}
 load("../../TRAVIS_scRNA_DATA/SkinSeuratTotal.Rdata")
 ```
 
-```{r}
+```{r,eval=FALSE}
 # META DATA FROM TRAVIS 
 meta.data <- read.csv("../../TRAVIS_scRNA_DATA/Cell_Level_Metadata.csv")
 ```
 
-# ccopy meta.data to the seurat object
-```{r}
+Copy meta.data to the seurat object
+
+```{r,eval=FALSE}
 #AddMetaData(SkinSeuratTotal,metadata = meta.data$Specific_CellType,col.name = "Specific_Celltype")
 skin.meta.data <- as.data.frame(SkinSeuratTotal@meta.data) %>% rownames_to_column("CellID")
-inner_join(x=skin.meta.data,y=meta.data,by="CellID")
 
 SkinSeuratTotal@meta.data <- inner_join(x=skin.meta.data,y=meta.data,by="CellID") %>% column_to_rownames("CellID")
 ```
 
-```{r}
+### Subset the scRNA data to only include normal / healthy skin
+
+```{r,eval=FALSE}
 #SUBSET DATA TO ONLY HEALTHY SAMPLES
 travis_NM_skin_scRNA<- subset(SkinSeuratTotal,subset = Condition == c("Normal"))
 ```
 
-
-```{r}
+```{r,eval=FALSE}
 ## PROCESS SC RNA DATA
 travis_NM_skin_scRNA <- NormalizeData(travis_NM_skin_scRNA)
 travis_NM_skin_scRNA <- FindVariableFeatures(travis_NM_skin_scRNA, selection.method = "vst", nfeatures = 2000)
@@ -62,40 +81,79 @@ travis_NM_skin_scRNA <- FindClusters(travis_NM_skin_scRNA, resolution = 1)
 travis_NM_skin_scRNA <- RunUMAP(travis_NM_skin_scRNA, dims = 1:40)
 ```
 
-## Normal skin - scRNA data from Travis paper 
-```{r}
-Idents(travis_NM_skin_scRNA) <- "Specific_CellType"
-DimPlot(travis_NM_skin_scRNA,pt.size = 2.5,label = TRUE)
-
-Idents(travis_NM_skin_scRNA) <- "CellType"
-DimPlot(travis_NM_skin_scRNA,pt.size = 2.5)
-```
+Save the processed Seurat object to an RDS file for quick import.
 
 ```{r,eval=FALSE}
-
 #saveRDS(travis_NM_skin_scRNA,file = "../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
 ```
+
+Import the processed Seurat object
 
 ```{r}
 travis_NM_skin_scRNA <- readRDS(file="../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
 ```
 
-```{r}
-single_cell.markers <- FindAllMarkers(travis_NM_skin_scRNA,assay = "RNA",logfc.threshold = 0.25)
-```
+Plot UMAP for normal scRNA data
 
 ```{r}
-filtered_single_cell.markers <- single_cell.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
+Idents(travis_NM_skin_scRNA) <- "Specific_CellType"
+DimPlot(travis_NM_skin_scRNA,pt.size = 2.5,label = TRUE)
+
+Idents(travis_NM_skin_scRNA) <- "CellType"
+DimPlot(travis_NM_skin_scRNA,pt.size = 2.5,label = TRUE)
+```
+
+### IDENTIFY MARKER GENES FOR ST DATA AND THE SC RNA DATA
+
+```{r}
+new.skin.combined <- PrepSCTFindMarkers(new.skin.combined,assay = "SCT")
+
+Idents(new.skin.combined) <- "seurat_clusters"
+
+new.skin.combined.markers <- FindAllMarkers(new.skin.combined, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT")
+
 filtered_spatial_markers <- new.skin.combined.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
 ```
 
-# Figure - 2B
+```{r,eval=FALSE}
+Idents(travis_NM_skin_scRNA) <- "Specific_CellType"
+
+single_cell.markers <- FindAllMarkers(travis_NM_skin_scRNA,assay = "RNA",logfc.threshold = 0.25)
+saveRDS(single_cell.markers,file="../../TRAVIS_scRNA_DATA/Travis_NM_skin_scRNA_markers.RDS")
+```
+
+```{r}
+single_cell.markers <- readRDS(file="../../TRAVIS_scRNA_DATA/Travis_NM_skin_scRNA_markers.RDS")
+filtered_single_cell.markers <- single_cell.markers %>% filter(p_val_adj<=0.05) %>% group_by(cluster) %>% top_n(n =300,wt = avg_log2FC) %>% filter(avg_log2FC>0.25)
+```
+
+## Figure - 2B
+
+### MIA ( Multi-modal intersection analysis)
+
+#### original publication- (<https://doi.org/10.1038/s41587-019-0392-8>)
+
+#### pre-computation parameters
+
+#### Number of intersecting / common genes between ST and scRNA data -set as background genes.
+
 ```{r}
 ##INTERSECT GENES BETWEEN scRNA and Spatial data
 st.genes <- unique(rownames(new.skin.combined@assays$Spatial@counts))
 sc.genes <- unique(rownames(travis_NM_skin_scRNA@assays$RNA@counts))
 all.genes.scrna_and_spt <- unique(intersect(sc.genes,st.genes))
 ```
+
+### Color scheme for MIA heatmaps
+
+```{r}
+library(RColorBrewer)
+library(pheatmap)
+col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
+```
+
+<a id="2b">
+
 ```{r}
 MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),single_cell.markers = filtered_single_cell.markers,spatial.markers = filtered_spatial_markers)
 
@@ -104,50 +162,75 @@ E.data <- E.data[,order(colnames(E.data))]
 pheatmap(E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
 ```
 
+</a>
+
+## Figure - 3A
+
+### Immune cell types
+
+<a id="3a">
+
 ```{r}
 immune_only.E.data <- E.data[,c("T cell-1","T cell-2","T cell-3","Myeloid-1","Langerhans","Mast-1","Mast-2")]
-pdf(file = "MIA_regions_IMMUNE_CELLS.pdf",width = 10,height = 4)
+#pdf(file = "MIA_regions_IMMUNE_CELLS.pdf",width = 10,height = 4)
 pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
-dev.off()
+#dev.off()
 ```
+
+</a>
+
+### Strucutural cell types
 
 ```{r}
 structure_only.E_data <- E.data[,c("Fibroblast-1","Fibroblast-2","Fibroblast-4","Fibroblast-5","HairFollicle","Keratinocyte-2","Keratinocyte-3","Keratinocyte-5","Keratinocyte-6","Keratinocyte-8","Sebocyte","Venule-1","Venule-2","Venule-3","Venule-4","VSMC-1")]
-pdf(file = "MIA_regions_STRUCTURAL_CELLS.pdf",width = 10,height = 4)
+#pdf(file = "MIA_regions_STRUCTURAL_CELLS.pdf",width = 10,height = 4)
 pheatmap(structure_only.E_data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
-dev.off()
+#dev.off()
 ```
 
-## NOW CALCULATING ENRICHMENT USING NEW DATASET (Travis et al)
-# Seurat based cell type enrichment
+### Calculate enrichment for each cell type (Using Seurat Anchor Integration)
+
 ```{r,eval=FALSE}
 # RUN THIS ON BIG PURPLE 
 skin_reference.2 <- SCTransform(travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
     RunUMAP(dims = 1:40)
 anchors <- FindTransferAnchors(reference = skin_reference.2, query = new.skin.combined, normalization.method = "SCT")
-predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference.2$Specific_CellType, prediction.assay = TRUE, 
-    weight.reduction = new.skin.combined[["pca"]],dims = 1:40)
+predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference.2$Specific_CellType, prediction.assay = TRUE, weight.reduction = new.skin.combined[["pca"]],dims = 1:40)
 new.skin.combined[["predictions_travis_data"]] <- predictions.assay
 ```
 
-## CELL TYPES FOR FIGURE 1 - Travis et al. single cell dataset (Only using the healthy subset of scRNA data)
+Color scale for cell type enrichment plots
+
+```{r}
+SpatialColors <- colorRampPalette(colors = rev(x = brewer.pal(n = 11, name = "Spectral")))
+cols <- SpatialColors(n = 100)
+```
+
+## Figure -1E
+
+<a id="1e">
+
 ```{r}
 Cell_types <- c("Fibroblast-1","HairFollicle","Keratinocyte-5","Keratinocyte-3","Sebocyte","VSMC-1","Melanocyte")
 DefaultAssay(new.skin.combined) <- "predictions_travis_data"
 for (x in Cell_types){
-  pdf(file = paste("HEALTHY_FEMALE_1_R2_CELL_TYPE_",x,".pdf"),width = 10,height = 15)
-  print(SpatialFeaturePlot(new.skin.combined, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE,images = "HealthyFemale.1.S2") + scale_fill_gradientn(colors=cols,limits = c(0,1.01))) 
-  dev.off()
+  #pdf(file = paste("HEALTHY_FEMALE_1_R2_CELL_TYPE_",x,".pdf"),width = 10,height = 15)
+  print(SpatialFeaturePlot(new.skin.combined, features = c(x), pt.size.factor = 2.5, ncol = 2, crop = TRUE,images = "HV2.S1.R2") + scale_fill_gradientn(colors=cols,limits = c(0,1.01))) 
+  #dev.off()
 }
 ```
 
-# Cell counts for travis healthy subset data
+</a>
+
+### Overall cell frequencies in healthy subset data
+
 ```{r}
 cell.counts <- as.data.frame(table(travis_NM_skin_scRNA@meta.data$Specific_CellType))
-write.csv(cell.counts,file="../../TRAVIS_scRNA_DATA/CELL_COUNTS_TRAVIS_HEALTHY_SKIN_DATA.csv")
+#write.csv(cell.counts,file="../../TRAVIS_scRNA_DATA/CELL_COUNTS_TRAVIS_HEALTHY_SKIN_DATA.csv")
 ```
 
-# Filtered out cell types with less than 50 cells
+### Filtered out cell types with less than 50 cells
+
 ```{r}
 filtered_cell.counts <- cell.counts %>% filter(Freq>50) 
 Idents(travis_NM_skin_scRNA) <- "Specific_CellType"
@@ -156,15 +239,20 @@ travis_healthy_data.subset <- subset(x = travis_NM_skin_scRNA, idents = c(filter
 DimPlot(travis_healthy_data.subset,pt.size = 2.5)
 ```
 
-# Plotting final travis healthy data UMAP
-# FIGURE -SUPPLEMENTARY S3
+### Supplementary Figure - S3A
+
+<a id="s3a">
+
 ```{r}
-pdf(width = 12,height=8,file = "UMAP_TRAVIS_DATA_HEALTHY_SAMPLES_ONLY.pdf")
-DimPlot(travis_healthy_data.subset,pt.size = 3.5)
-dev.off()
+#pdf(width = 12,height=8,file = "UMAP_TRAVIS_DATA_HEALTHY_SAMPLES_ONLY.pdf")
+DimPlot(travis_healthy_data.subset,pt.size = 3.5,group.by = "CellType")
+#dev.off()
 ```
 
-# Number of genes used in MIA - (Needed for Venn diagram)
+</a>
+
+### Data for Venn diagram - Figure 1F
+
 ```{r,eval=FALSE}
 
 cluster.5 <- filtered_spatial_markers %>% filter(cluster==5)
@@ -177,43 +265,3 @@ Keratinocyte.5 <- filtered_single_cell.markers %>% filter(cluster=="Keratinocyte
 
 length(intersect(cluster.6$gene,Keratinocyte.5$gene))
 ```
-
-# SINGLE CELL DATA - ENRICHMENT PLOTS (USING ONLY ONE HEALTHY SAMPLE)
-```{r}
-HEALTHY.Female1.s2.clean<- st_filter_by_genes(st.data = HEALTHY.Female1.s2.clean,x = 200)
-HEALTHY.Female1.s2.clean <- SCTransform(HEALTHY.Female1.s2.clean, verbose = FALSE,assay="Spatial")
-HEALTHY.Female1.s2.clean <- RunPCA(HEALTHY.Female1.s2.clean)
-```
-
-```{r}
-travis_NM_skin_scRNA <- readRDS(file="../../TRAVIS_scRNA_DATA/travis_NM_skin_scRNA.RDS")
-
-# RUN THIS ON BIG PURPLE 
-skin_reference.3 <- SCTransform(travis_NM_skin_scRNA, ncells = 3000, verbose = FALSE) %>% RunPCA(verbose = FALSE) %>% 
-    RunUMAP(dims = 1:40)
-anchors <- FindTransferAnchors(reference = skin_reference.3, query = HEALTHY.Female1.s2.clean, normalization.method = "SCT")
-predictions.assay <- TransferData(anchorset = anchors, refdata = skin_reference.3$Specific_CellType, prediction.assay = TRUE, 
-    weight.reduction = HEALTHY.Female1.s2.clean[["pca"]],dims = 1:40)
-HEALTHY.Female1.s2.clean[["predictions_travis_data"]] <- predictions.assay
-
-```
-
-```{r}
-SpatialColors <- colorRampPalette(colors = rev(x = brewer.pal(n = 11, name = "Spectral")))
-cols <- SpatialColors(n = 100)
-```
-
-```{r}
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Melanocyte"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("VSMC-1"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("HairFollicle"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Keratinocyte-5"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Sebocyte"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-
-SpatialFeaturePlot(HEALTHY.Female1.s2.clean,features = c("Fibroblast-1"), pt.size.factor = 2.5)+ scale_fill_gradientn(colors=cols,limits = c(0,1.000001))
-```
-

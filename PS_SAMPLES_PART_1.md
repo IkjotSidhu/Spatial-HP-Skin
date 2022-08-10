@@ -450,7 +450,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 4.995016 secs
+    ## Wall clock passed: Time difference of 4.953012 secs
 
     ## Determine variable features
 
@@ -484,7 +484,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 6.098705 secs
+    ## Wall clock passed: Time difference of 6.147041 secs
 
     ## Determine variable features
 
@@ -518,7 +518,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 6.590998 secs
+    ## Wall clock passed: Time difference of 6.691103 secs
 
     ## Determine variable features
 
@@ -552,7 +552,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.82562 secs
+    ## Wall clock passed: Time difference of 12.21232 secs
 
     ## Determine variable features
 
@@ -586,7 +586,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.469621 secs
+    ## Wall clock passed: Time difference of 5.284481 secs
 
     ## Determine variable features
 
@@ -620,7 +620,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 9.863442 secs
+    ## Wall clock passed: Time difference of 9.620583 secs
 
     ## Determine variable features
 
@@ -654,7 +654,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 9.49179 secs
+    ## Wall clock passed: Time difference of 9.636147 secs
 
     ## Determine variable features
 
@@ -1472,7 +1472,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.82522 secs
+    ## Wall clock passed: Time difference of 4.771179 secs
 
     ## Determine variable features
 
@@ -1506,7 +1506,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 10.7899 secs
+    ## Wall clock passed: Time difference of 6.366016 secs
 
     ## Determine variable features
 
@@ -1540,7 +1540,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 8.70619 secs
+    ## Wall clock passed: Time difference of 6.377364 secs
 
     ## Determine variable features
 
@@ -1574,7 +1574,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 12.44807 secs
+    ## Wall clock passed: Time difference of 10.58626 secs
 
     ## Determine variable features
 
@@ -1608,7 +1608,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 6.229242 secs
+    ## Wall clock passed: Time difference of 5.338243 secs
 
     ## Determine variable features
 
@@ -1642,7 +1642,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.95114 secs
+    ## Wall clock passed: Time difference of 9.811453 secs
 
     ## Determine variable features
 
@@ -1676,7 +1676,7 @@ while(i <= length(Healthy_Samples)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.00695 secs
+    ## Wall clock passed: Time difference of 8.953163 secs
 
     ## Determine variable features
 
@@ -1720,7 +1720,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 4.401299 secs
+    ## Wall clock passed: Time difference of 4.209438 secs
 
     ## Determine variable features
 
@@ -1754,7 +1754,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 3.468995 secs
+    ## Wall clock passed: Time difference of 3.190827 secs
 
     ## Determine variable features
 
@@ -1788,7 +1788,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.415236 secs
+    ## Wall clock passed: Time difference of 4.036865 secs
 
     ## Determine variable features
 
@@ -1822,7 +1822,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.83623 secs
+    ## Wall clock passed: Time difference of 9.519512 secs
 
     ## Determine variable features
 
@@ -1856,7 +1856,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.07031 secs
+    ## Wall clock passed: Time difference of 10.09912 secs
 
     ## Determine variable features
 
@@ -1890,7 +1890,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 4.176657 secs
+    ## Wall clock passed: Time difference of 3.784827 secs
 
     ## Determine variable features
 
@@ -1924,7 +1924,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.204008 secs
+    ## Wall clock passed: Time difference of 4.488173 secs
 
     ## Determine variable features
 
@@ -1958,7 +1958,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.21418 secs
+    ## Wall clock passed: Time difference of 7.780246 secs
 
     ## Determine variable features
 
@@ -1992,7 +1992,7 @@ while(i <= length(NON_LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 10.44182 secs
+    ## Wall clock passed: Time difference of 8.509751 secs
 
     ## Determine variable features
 
@@ -2036,7 +2036,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.785035 secs
+    ## Wall clock passed: Time difference of 5.56984 secs
 
     ## Determine variable features
 
@@ -2070,7 +2070,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 5.429883 secs
+    ## Wall clock passed: Time difference of 5.286479 secs
 
     ## Determine variable features
 
@@ -2104,7 +2104,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 6.535982 secs
+    ## Wall clock passed: Time difference of 6.72866 secs
 
     ## Determine variable features
 
@@ -2138,7 +2138,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.45022 secs
+    ## Wall clock passed: Time difference of 11.63936 secs
 
     ## Determine variable features
 
@@ -2172,7 +2172,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 10.183 secs
+    ## Wall clock passed: Time difference of 9.675427 secs
 
     ## Determine variable features
 
@@ -2206,7 +2206,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 10.6436 secs
+    ## Wall clock passed: Time difference of 10.19168 secs
 
     ## Determine variable features
 
@@ -2240,7 +2240,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 7.284363 secs
+    ## Wall clock passed: Time difference of 6.766872 secs
 
     ## Determine variable features
 
@@ -2274,7 +2274,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 4.03528 secs
+    ## Wall clock passed: Time difference of 4.136579 secs
 
     ## Determine variable features
 
@@ -2308,7 +2308,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 4.975784 secs
+    ## Wall clock passed: Time difference of 5.096082 secs
 
     ## Determine variable features
 
@@ -2342,7 +2342,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 11.83433 secs
+    ## Wall clock passed: Time difference of 11.98762 secs
 
     ## Determine variable features
 
@@ -2378,7 +2378,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 9.120652 secs
+    ## Wall clock passed: Time difference of 9.29804 secs
 
     ## Determine variable features
 
@@ -2412,7 +2412,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 8.345931 secs
+    ## Wall clock passed: Time difference of 8.245258 secs
 
     ## Determine variable features
 
@@ -2446,7 +2446,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 13.13295 secs
+    ## Wall clock passed: Time difference of 12.80757 secs
 
     ## Determine variable features
 
@@ -2480,7 +2480,7 @@ while(i <= length(LES_SAMPLES)){
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 8.506447 secs
+    ## Wall clock passed: Time difference of 8.656573 secs
 
     ## Determine variable features
 
@@ -2530,13 +2530,14 @@ color.labels.anchor <- c("0 - Fibroblasts"="#8cccf0","1 - Mixed"="#e0bfb6","2 â€
 
 ## FIGURE S4A
 
-\###- UMAP after anchor batch correction <a id="s4a">
+### UMAP after anchor batch correction <a id="s4a">
 
 ``` r
 DimPlot(all.skin.combined,pt.size = 3.5,shuffle = TRUE,cols = color.labels.anchor,group.by = "Spatial.regions_V1")
 ```
 
 ![](PS_SAMPLES_PART_1_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
+
 </a>
 
 ## FIGURE SUPPLEMENTARY S4C
@@ -2618,7 +2619,7 @@ top10 <- all.skin.combined.markers %>%
 
 ## FIGURE SUPPLEMENTARY (S6)
 
-### HEATMAP -showing top 10 marker genes per cluster 
+### HEATMAP -showing top 10 marker genes per cluster
 
 <a id="s6">
 
@@ -2627,6 +2628,7 @@ DoHeatmap(all.skin.combined, features = top10$gene,assay = "SCT",group.colors = 
 ```
 
 ![](PS_SAMPLES_PART_1_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+
 </a>
 
 ### PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS

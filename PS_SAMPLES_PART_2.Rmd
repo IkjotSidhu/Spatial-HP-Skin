@@ -27,6 +27,7 @@ library(Seurat)
 library(cowplot)
 library(ggsci)
 library(ggpubr)
+library(harmony)
 ```
 
 ```{r,eval=FALSE}
@@ -56,14 +57,36 @@ skin_data.hm.sct <- skin_data.hm.sct %>%
 skin_data.hm.sct <- readRDS(file="../ALL_SPATIAL_SAMPLES.RDS")
 ```
 
+```{r}
+## COLOR FOR LABELS
+color.labels.heatmap <- c("#87CEFA",
+"#4876FF",
+"#CD853F",
+"#BF96FF",
+"#FF0000",
+"#CAF178",
+"#E0BFB6",
+"#68228B",
+"#7B0000",
+"#FFC71A",
+"#C355A0",
+"#00B923",
+"#8B5A2B",
+"#838B8B",
+"#005947",
+"#C1CDCD",
+"#FF7545")
+```
+
 ```{r,fig.height=22,fig.width=15}
 DefaultAssay(skin_data.hm.sct) <- "SCT"
+skin_data.hm.sct.markers <- FindAllMarkers(skin_data.hm.sct, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT",) %>% filter(p_val_adj<0.05)
 top10 <- skin_data.hm.sct.markers %>%
     group_by(cluster) %>%
     filter(gene %in% rownames(skin_data.hm.sct@assays$SCT@scale.data)) %>%
     top_n(n = 10, wt = avg_log2FC)
 
-DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels,angle=90) + NoLegend()
+DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels.heatmap,angle=90) + NoLegend()
 ```
 
 Defining cluster labels based on marker genes
@@ -196,7 +219,7 @@ panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_co
 
 ### FIGURE S7B -
 
-###  (1) UMIs per cluster<a id="s7b">
+### (1) UMIs per cluster<a id="s7b">
 
 ### (2) Number of genes expressed per cluster
 

@@ -51,6 +51,32 @@ MIA <- function(total_genes,single_cell.markers,spatial.markers)
   return(E.SCORES)
 }
 
+MIA_ENRICH_bullk <- function(stlist,bulklist,total){
+  overlap <- length(intersect(stlist$gene,bulklist$Gene))
+  C <- length(bulklist$Gene)
+  D <- length(stlist$gene)
+  
+  # ENRICHMENT CALCULATION
+  e <- -log10(phyper(overlap,C, total - C, D, lower.tail = FALSE))
+  return(e)
+}
+MIA_bulk <- function(total_genes,markers,spatial.markers,name)
+{
+
+  spatial.regions <- spatial.markers %>% dplyr::select(cluster) %>% unique() %>% as.list()
+  E.SCORES <- data.frame(spatial.regions)
+  e_list <- c()
+      #list.append(e_list,i)
+    for(y in spatial.regions){
+      for(z in y){
+        spatial_data <- spatial.markers %>% filter(cluster==z)
+        e <- MIA_ENRICH_bullk(spatial_data,markers,total = total_genes)
+        e_list <- c(e_list,e)
+      }
+    }
+   E.SCORES[paste(name)] <- e_list
+  return(E.SCORES)
+}
 
 n_cells = nrow(combo_tbl)
 for (ac in integrated_clusters) {

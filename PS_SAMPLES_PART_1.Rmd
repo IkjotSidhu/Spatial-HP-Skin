@@ -875,7 +875,7 @@ color.labels.anchor <- c("0 - Fibroblasts"="#8cccf0","1 - Mixed"="#e0bfb6","2 â€
 
 ## FIGURE S4A
 
-###- UMAP after anchor batch correction <a id="s4a">
+### UMAP after anchor batch correction <a id="s4a">
 
 ```{r,fig.height=8,fig.width=12}
 DimPlot(all.skin.combined,pt.size = 3.5,shuffle = TRUE,cols = color.labels.anchor,group.by = "Spatial.regions_V1")
@@ -898,7 +898,7 @@ VlnPlot(all.skin.combined,features =  "nFeature_Spatial") + scale_fill_manual(va
 VlnPlot(all.skin.combined,features =  "nCount_Spatial") + scale_fill_manual(values =color.labels.anchor)
 ```
 
-```{r,fig.height=22,fig.width=15}
+```{r}
 Idents(all.skin.combined) <- "Spatial.regions_V1"
 all.skin.combined <- PrepSCTFindMarkers(all.skin.combined)
 all.skin.combined.markers <- FindAllMarkers(all.skin.combined, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT",) %>% filter(p_val_adj<0.05)
@@ -911,11 +911,11 @@ top10 <- all.skin.combined.markers %>%
 
 ## FIGURE SUPPLEMENTARY (S6)
 
-### HEATMAP -showing top 10 marker genes per cluster 
+### HEATMAP -showing top 10 marker genes per cluster
 
 <a id="s6">
 
-```{R}
+```{R,fig.height=22,fig.width=15}
 DoHeatmap(all.skin.combined, features = top10$gene,assay = "SCT",group.colors = color.labels.anchor,angle = 90) + NoLegend()
 ```
 

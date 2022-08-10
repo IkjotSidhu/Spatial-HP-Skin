@@ -1,7 +1,9 @@
 R Notebook
 ================
 
-\##PSO + PSA + NORMAL SKIN COMBINED ANALYSIS - PART 2 \## CONTINUED
+# PSO + PSA + NORMAL SKIN COMBINED ANALYSIS - PART 2
+
+# CONTINUED
 
 ## Harmony-batch correction
 
@@ -66,6 +68,14 @@ library(ggpubr)
     ##     get_legend
 
 ``` r
+library(harmony)
+```
+
+    ## Loading required package: Rcpp
+
+    ## Warning: package 'Rcpp' was built under R version 4.1.2
+
+``` r
 load("../all_samples_merge.RData")
 ```
 
@@ -91,6 +101,82 @@ skin_data.hm.sct <- skin_data.hm.sct %>%
 ``` r
 skin_data.hm.sct <- readRDS(file="../ALL_SPATIAL_SAMPLES.RDS")
 ```
+
+``` r
+## COLOR FOR LABELS
+color.labels.heatmap <- c("#87CEFA",
+"#4876FF",
+"#CD853F",
+"#BF96FF",
+"#FF0000",
+"#CAF178",
+"#E0BFB6",
+"#68228B",
+"#7B0000",
+"#FFC71A",
+"#C355A0",
+"#00B923",
+"#8B5A2B",
+"#838B8B",
+"#005947",
+"#C1CDCD",
+"#FF7545")
+```
+
+``` r
+DefaultAssay(skin_data.hm.sct) <- "SCT"
+skin_data.hm.sct.markers <- FindAllMarkers(skin_data.hm.sct, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT",) %>% filter(p_val_adj<0.05)
+```
+
+    ## Calculating cluster 0 Fibroblasts
+
+    ## Calculating cluster 1 Macs + fibroblasts
+
+    ## Calculating cluster 2 Eccrine + melanocyte precursors
+
+    ## Calculating cluster 3 Epidermis
+
+    ## Calculating cluster 4 Epidermis
+
+    ## Calculating cluster 5 Connective tissue
+
+    ## Calculating cluster 6 Mixed
+
+    ## Warning in FindMarkers.default(object = data.use, slot = data.slot, counts =
+    ## counts, : No features pass logfc.threshold threshold; returning empty data.frame
+
+    ## Calculating cluster 7 Epidermis
+
+    ## Calculating cluster 8 Hair follicle and sebaceous glands
+
+    ## Calculating cluster 9 Adipose
+
+    ## Calculating cluster 10 Suprabasal keratinocytes
+
+    ## Calculating cluster 11 Smooth muscle
+
+    ## Calculating cluster 12 Endothelial cells
+
+    ## Calculating cluster 13 Immunoglobulins, fibroblasts
+
+    ## Calculating cluster 14 Smooth muscle
+
+    ## Calculating cluster 15 Mixed
+
+    ## Calculating cluster 16 Adipose, fibroblasts
+
+``` r
+top10 <- skin_data.hm.sct.markers %>%
+    group_by(cluster) %>%
+    filter(gene %in% rownames(skin_data.hm.sct@assays$SCT@scale.data)) %>%
+    top_n(n = 10, wt = avg_log2FC)
+
+DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels.heatmap,angle=90) + NoLegend()
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+Defining cluster labels based on marker genes
 
 ``` r
 ## ADDING CLUSTER LABELS
@@ -133,26 +219,6 @@ color.labels <- c("0 Fibroblasts"="#87CEFA",
 ```
 
 ``` r
-## COLOR FOR LABELS
-color.bar <- c("lightskyblue",
-"royalblue1",
-"tan3","darkorchid1",
-"violetred",
-"paleturquoise1",
-"azure2",
-"darkorchid4",
-"darkorange",
-"gold",
-"violet",
-"tomato3",
-"tan4",
-"azure4",
-"tomato",
-"azure3",
-"goldenrod1")
-```
-
-``` r
 names(cluster.labels) <- levels(skin_data.hm.sct)
 skin_data.hm.sct <- RenameIdents(skin_data.hm.sct, cluster.labels)
 skin_data.hm.sct <- StashIdent(skin_data.hm.sct, save.name = "Spatial.regions")
@@ -163,87 +229,17 @@ skin_data.hm.sct <- StashIdent(skin_data.hm.sct, save.name = "Spatial.regions")
 
 ``` r
 Idents(skin_data.hm.sct) <- "Spatial.regions"
-
-DimPlot(skin_data.hm.sct)
 ```
-
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
-
-``` r
-skin_data.hm.sct <- PrepSCTFindMarkers(skin_data.hm.sct,assay = "SCT")
-```
-
-    ## Only one SCT model is stored - skipping recalculating corrected counts
-
-``` r
-skin_data.hm.sct.markers <- FindAllMarkers(skin_data.hm.sct, min.pct = 0.25, assay = "SCT") %>% filter(p_val_adj<0.05)
-```
-
-    ## Calculating cluster 0 Fibroblasts
-
-    ## Calculating cluster 1 Macs + fibroblasts
-
-    ## Calculating cluster 2 Eccrine + melanocyte precursors
-
-    ## Calculating cluster 3 Epidermis
-
-    ## Calculating cluster 4 Epidermis
-
-    ## Calculating cluster 5 Connective tissue
-
-    ## Calculating cluster 6 Mixed
-
-    ## Calculating cluster 7 Epidermis
-
-    ## Calculating cluster 8 Hair follicle and sebaceous glands
-
-    ## Calculating cluster 9 Adipose
-
-    ## Calculating cluster 10 Suprabasal keratinocytes
-
-    ## Calculating cluster 11 Smooth muscle
-
-    ## Calculating cluster 12 Endothelial cells
-
-    ## Calculating cluster 13 Immunoglobulins, fibroblasts
-
-    ## Calculating cluster 14 Smooth muscle
-
-    ## Calculating cluster 15 Mixed
-
-    ## Calculating cluster 16 Adipose, fibroblasts
-
-``` r
-levels(skin_data.hm.sct@meta.data$Spatial.regions) 
-```
-
-    ##  [1] "0 Fibroblasts"                       
-    ##  [2] "1 Macs + fibroblasts"                
-    ##  [3] "2 Eccrine + melanocyte precursors"   
-    ##  [4] "3 Epidermis"                         
-    ##  [5] "4 Epidermis"                         
-    ##  [6] "5 Connective tissue"                 
-    ##  [7] "6 Mixed"                             
-    ##  [8] "7 Epidermis"                         
-    ##  [9] "8 Hair follicle and sebaceous glands"
-    ## [10] "9 Adipose"                           
-    ## [11] "10 Suprabasal keratinocytes"         
-    ## [12] "11 Smooth muscle"                    
-    ## [13] "12 Endothelial cells"                
-    ## [14] "13 Immunoglobulins, fibroblasts"     
-    ## [15] "14 Smooth muscle"                    
-    ## [16] "15 Mixed"                            
-    ## [17] "16 Adipose, fibroblasts"
 
 ``` r
 DimPlot(skin_data.hm.sct,split.by="DISEASE_STATUS",cols=color.labels,pt.size=3.5)
 ```
 
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## FIGURE 3B and S4A
 
-\###UMAP WITH ALL SPATIAL SAMPLES (AFTER HARMONY BATCH CORRECTION)
+### UMAP WITH ALL SPATIAL SAMPLES (AFTER HARMONY BATCH CORRECTION)
 
 <a id="3b">
 
@@ -251,7 +247,7 @@ DimPlot(skin_data.hm.sct,split.by="DISEASE_STATUS",cols=color.labels,pt.size=3.5
 DimPlot(skin_data.hm.sct,cols=color.labels,pt.size=3.5)
 ```
 
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 </a>
 
@@ -265,7 +261,7 @@ DimPlot(skin_data.hm.sct,cols=color.labels,pt.size=3.5)
 SpatialDimPlot(skin_data.hm.sct,images = c("ST_21_NL_Batch_6"),cols=color.labels,pt.size.factor = 2.5)
 ```
 
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ## FIGURE 3A -
 
@@ -275,7 +271,7 @@ SpatialDimPlot(skin_data.hm.sct,images = c("ST_21_NL_Batch_6"),cols=color.labels
 SpatialDimPlot(skin_data.hm.sct,images = c("ST_22L_Batch_8"),cols=color.labels,pt.size.factor = 2.5)
 ```
 
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 </a>
 
@@ -287,14 +283,17 @@ top10 <- skin_data.hm.sct.markers %>%
     top_n(n = 10, wt = avg_log2FC)
 ```
 
-<a id="s5"> \## FIGURE SUPPLEMENTARY S5 \### HEATMAP showing top marker
-genes after Harmony batch correction
+<a id="s5">
+
+## FIGURE SUPPLEMENTARY S5 -
+
+### HEATMAP showing top marker genes after Harmony batch correction
 
 ``` r
 DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels,angle=90) + NoLegend()
 ```
 
-![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 </a>
 
@@ -305,7 +304,11 @@ seurat_clusters.df.v2 <- table(skin_data.hm.sct@active.ident,skin_data.hm.sct@me
   dplyr::rename(Cluster_id=Var1,Group=Var2,Sample_id=Var3) %>% filter(Freq!=0)  %>% group_by(Sample_id)%>% mutate(Fraction=Freq*100/sum(Freq)) %>% mutate(SUM_OF_FRACTIONS=sum(Fraction)) 
 ```
 
-<a id="3c"> \## FIGURE 3c \### PERCENTAGE COMPOSITION PLOT
+<a id="3c">
+
+## FIGURE 3C -
+
+### PERCENTAGE COMPOSITION PLOT
 
 ``` r
 black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
@@ -315,5 +318,26 @@ ggplot(seurat_clusters.df.v2,aes(x=Group,y=Freq,fill=Cluster_id)) + geom_bar(sta
 panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks)) + scale_fill_manual(values = color.labels)
 ```
 
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+</a>
+
+### FIGURE S7B -
+
+### (1) UMIs per cluster<a id="s7b">
+
+### (2) Number of genes expressed per cluster
+
+``` r
+VlnPlot(skin_data.hm.sct,features =  "nFeature_Spatial") + scale_fill_manual(values = color.labels)
+```
+
 ![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+VlnPlot(skin_data.hm.sct,features =  "nCount_Spatial") + scale_fill_manual(values = color.labels)
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+
 </a>

@@ -52,8 +52,8 @@ MIA <- function(total_genes,single_cell.markers,spatial.markers)
 }
 
 MIA_ENRICH_bullk <- function(stlist,bulklist,total){
-  overlap <- length(intersect(stlist$gene,bulklist$Gene))
-  C <- length(bulklist$Gene)
+  overlap <- length(intersect(stlist$gene,bulklist))
+  C <- length(bulklist)
   D <- length(stlist$gene)
   
   # ENRICHMENT CALCULATION
@@ -62,7 +62,6 @@ MIA_ENRICH_bullk <- function(stlist,bulklist,total){
 }
 MIA_bulk <- function(total_genes,markers,spatial.markers,name)
 {
-
   spatial.regions <- spatial.markers %>% dplyr::select(cluster) %>% unique() %>% as.list()
   E.SCORES <- data.frame(spatial.regions)
   e_list <- c()

@@ -206,7 +206,7 @@ pseudo_bulk_out <- function(Seurat_obj,group_label,groups_tbl_path){
   groups.levels <- levels(groups.table[,group.name])
   counts.final <- lapply(counts.file, as.integer) %>% as.data.frame(row.names = pseudo.counts.df$Gene)
   dds <- DESeqDataSetFromMatrix(countData = counts.final,colData=groups.table,design = ~BATCH + GROUP_I)
-  dds <- DESeq(dds)
+  dds <- DESeq(dds,quiet = TRUE)
   return(dds)
   #pdf(file=paste("PCA",,"PLOT_PSEUDOBULK.pdf"),height = 8,width = 10)
   #print(plotPCA(vsd, intgroup=c("GROUP_I", "SEVERITY")))

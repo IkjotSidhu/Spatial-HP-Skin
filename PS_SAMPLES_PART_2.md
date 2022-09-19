@@ -283,11 +283,11 @@ top10 <- skin_data.hm.sct.markers %>%
     top_n(n = 10, wt = avg_log2FC)
 ```
 
-<a id="s5">
-
 ## FIGURE SUPPLEMENTARY S5 -
 
 ### HEATMAP showing top marker genes after Harmony batch correction
+
+<a id="s5">
 
 ``` r
 DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels,angle=90) + NoLegend()
@@ -304,11 +304,11 @@ seurat_clusters.df.v2 <- table(skin_data.hm.sct@active.ident,skin_data.hm.sct@me
   dplyr::rename(Cluster_id=Var1,Group=Var2,Sample_id=Var3) %>% filter(Freq!=0)  %>% group_by(Sample_id)%>% mutate(Fraction=Freq*100/sum(Freq)) %>% mutate(SUM_OF_FRACTIONS=sum(Fraction)) 
 ```
 
-<a id="3c">
-
 ## FIGURE 3C -
 
 ### PERCENTAGE COMPOSITION PLOT
+
+<a id="3c">
 
 ``` r
 black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
@@ -324,9 +324,9 @@ panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_co
 
 ### FIGURE S7B -
 
-### (1) UMIs per cluster<a id="s7b">
+### (1) UMIs per cluster
 
-### (2) Number of genes expressed per cluster
+<a id="s7b"> \### (2) Number of genes expressed per cluster
 
 ``` r
 VlnPlot(skin_data.hm.sct,features =  "nFeature_Spatial") + scale_fill_manual(values = color.labels)
@@ -339,5 +339,84 @@ VlnPlot(skin_data.hm.sct,features =  "nCount_Spatial") + scale_fill_manual(value
 ```
 
 ![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
-
 </a>
+
+``` r
+saveRDS(skin_data.hm.sct.markers,"ALL_ST_HARMONY_ALIGNED_MARKERS.RDS")
+```
+
+## Spatial plots with cluster labels
+
+``` r
+Images(skin_data.hm.sct)
+```
+
+    ##  [1] "ST_13_L_Batch_1"                               
+    ##  [2] "ST_14_L_R1_Batch_2"                            
+    ##  [3] "ST_17_L_Batch_2"                               
+    ##  [4] "ST_14_L_R2_Batch_5"                            
+    ##  [5] "ST_20_L_Batch_6"                               
+    ##  [6] "ST_21_L_Batch_6"                               
+    ##  [7] "ST_16_L_Batch_1"                               
+    ##  [8] "ST_15_L_R1_Batch_3"                            
+    ##  [9] "ST_18_L_R1_Batch_4"                            
+    ## [10] "ST_15_L_R2_Batch_5"                            
+    ## [11] "ST_18_L_R2_Batch_5"                            
+    ## [12] "PSA_Lesional_Patient2_Batch_8_ROCHESTER_SAMPLE"
+    ## [13] "PSO_Lesional_Patient1_Batch_8_ROCHESTER_SAMPLE"
+    ## [14] "ST_22L_Batch_8"                                
+    ## [15] "ST_13_NL_Batch_1"                              
+    ## [16] "ST_14_NL_Batch_2"                              
+    ## [17] "ST_17_NL_Batch_2"                              
+    ## [18] "ST_20_NL_Batch_6"                              
+    ## [19] "ST_21_NL_Batch_6"                              
+    ## [20] "ST_16_NL_Batch_1"                              
+    ## [21] "ST_15_NL_Batch_3"                              
+    ## [22] "ST_18_NL_Batch_4"                              
+    ## [23] "ST_22NL_Batch_8"                               
+    ## [24] "ST.HM.1.R1"                                    
+    ## [25] "ST.HM.1.R2"                                    
+    ## [26] "ST.HF.1.R1"                                    
+    ## [27] "ST.HF.1.R2"                                    
+    ## [28] "ST.HF.1.R3"                                    
+    ## [29] "ST.HF.2.R1"                                    
+    ## [30] "ST.HF.2.R2"
+
+``` r
+## HEALTHY SAMPLE
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5,  crop = TRUE,images = "ST.HF.1.R2",cols = color.labels) 
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+## NON-LESIONAL PSO SAMPLE
+# PSO_Non_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct,  pt.size.factor = 2.5,  crop = TRUE,images = "ST_21_NL_Batch_6",cols = color.labels)
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+
+``` r
+## LESIONAL PSO SAMPLE
+# PSO_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5,  crop = TRUE,images = "ST_21_L_Batch_6",cols = color.labels)
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->
+
+``` r
+## LESIONAL PSA SAMPLE
+# PSA_LesionalSkinPatient1_Batch_1
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE,images = "ST_16_L_Batch_1",cols = color.labels)
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
+
+``` r
+## NON-LESIONAL PSA SAMPLE
+
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE,images = "ST_16_NL_Batch_1",cols = color.labels)
+```
+
+![](PS_SAMPLES_PART_2_files/figure-gfm/unnamed-chunk-22-5.png)<!-- -->

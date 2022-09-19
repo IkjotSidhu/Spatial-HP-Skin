@@ -93,7 +93,6 @@ HEALTHY.Female1.s2.clean <- subset(HEALTHY.Female1.s2,cells=subset_spots)
 (HV - Healthy Volunteer, R - Replicate)
 
 ```{r}
-
 HEALTHY.Male.s1$sample.id<- "HV1_S1_R1" 
 HEALTHY.Male.s2$sample.id<- "HV1_S1_R2"
 
@@ -419,11 +418,42 @@ all_healthy_samples.hm.sct.v1 <- all_healthy_samples.hm.sct %>%
 ```
 
 ```{r}
-pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
+#pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
 DimPlot(all_healthy_samples.hm.sct.v1,cols = custom_colors,pt.size = 3.5)
-dev.off()
+#dev.off()
+DimPlot(all_healthy_samples.hm.sct.v1,cols = color.labels,pt.size = 3.5)
+```
+```{r}
+cluster.labels <- c("0 Dermis fibroblasts","1 Mixed","2 Dermis adipose, connective tissue","3 Macrophages","4 Epidermis 1","5 Smooth muscle cells","6 Epidermis 2","7 Melanocytes","8 Dermal lymphatics")
+names(cluster.labels) <- levels(all_healthy_samples.hm.sct.v1)
+all_healthy_samples.hm.sct.v1 <- RenameIdents(all_healthy_samples.hm.sct.v1, cluster.labels)
+all_healthy_samples.hm.sct.v1 <- StashIdent(all_healthy_samples.hm.sct.v1, save.name = "Spatial.regions")
 ```
 
+```{r}
+custom_colors_v1 <- c("#B4DFFC","#6EAB3D","#FFD700","#A020F0","#FFA500","#AEDD3C","#595959","#D2AF81FF","#3A49FC")
+show_col(custom_colors_v1)
+```
+
+#Define color scheme
+```{r}
+custom_colors <- c("#B4DFFC","#6EAB3D","#FFD700","#A020F0","#FFA500","#AEDD3C","#595959","#D2AF81FF","#3A49FC","#FF0000","#A86F3D","#A18FAA")
+color.labels <- c("0 Dermis fibroblasts"="#B4DFFC","1 Mixed"="#6EAB3D","2 Dermis adipose, connective tissue"="#FFD700","3 Macrophages"="#A020F0","4 Epidermis 1"="#FFA500","5 Smooth muscle cells"="#AEDD3C","6 Epidermis 2"="#595959","7 Melanocytes"="#D2AF81FF","8 Dermal lymphatics"="#3A49FC")
+```
+
+
+### Generate Spatial plot for all samples
+After harmony batch correction
+```{r,eval=FALSE}
+dir.create("HM_CORRECTED_HEALTHY_SAMPLES/")
+
+images <- Images(all_healthy_samples.hm.sct.v1) %>% as.vector()
+for(x in images){
+  pdf(width = 8,height=10,file = paste("HM_CORRECTED_HEALTHY_SAMPLES/",x,"_(HM_CORRECTED)_HEALTHY_SPATIAL_PLOT.pdf"))
+  print(SpatialDimPlot(all_healthy_samples.hm.sct.v1,images=x,cols = color.labels,pt.size.factor = 2))
+  dev.off()
+}
+```
 ```{r}
 all_healthy_samples.hm.sct.v1 <- PrepSCTFindMarkers(all_healthy_samples.hm.sct.v1,assay = "SCT")
 Idents(all_healthy_samples.hm.sct.v1) <- "seurat_clusters"
@@ -435,6 +465,23 @@ top8 <- all_healthy_samples.hm.sct.v1.markers %>%
     top_n(n = 8, wt = avg_log2FC)
 pdf(width = 20,height=15,file = "HEATMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
 print(DoHeatmap(all_healthy_samples.hm.sct.v1, features = top8$gene,assay = "SCT",group.colors = custom_colors) + NoLegend())
+dev.off()
+```
+
+## PERCENTAGE PLOT FOR DIFFERENT SPATIAL REGIONS
+
+<a id="1d">
+
+```{r figure-1d,fig.height=10,fig.width=10}
+Regions.df <- table(all_healthy_samples.hm.sct.v1@meta.data$Spatial.regions,all_healthy_samples.hm.sct.v1@meta.data$sample.id) %>% as.data.frame() %>% dplyr::rename(Spatial_Region=Var1,Sample=Var2) 
+
+black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
+
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+pdf(file="HM_CORRECTED_HEALTHY_SAMPLES/PERCENTAGE_COMPOSTION_PLOT_HEALTHY_SAMPLES(AFTER_HM_CORRECTION).pdf",height = 14,width = 8)
+ggplot(Regions.df,aes(x=Sample,y=Freq,fill=Spatial_Region)) + geom_bar(stat="identity",position="fill") + scale_fill_manual(values =color.labels)  + ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks)) + ylab("% Composition of Sample by Spatial Region / Clusters")
 dev.off()
 ```
 

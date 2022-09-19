@@ -226,3 +226,35 @@ VlnPlot(skin_data.hm.sct,features =  "nFeature_Spatial") + scale_fill_manual(val
 VlnPlot(skin_data.hm.sct,features =  "nCount_Spatial") + scale_fill_manual(values = color.labels)
 ```
 </a>
+```{r}
+saveRDS(skin_data.hm.sct.markers,"ALL_ST_HARMONY_ALIGNED_MARKERS.RDS")
+```
+
+## Spatial plots with cluster labels
+```{r}
+Images(skin_data.hm.sct)
+```
+
+```{r}
+## HEALTHY SAMPLE
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5,  crop = TRUE,images = "ST.HF.1.R2",cols = color.labels) 
+
+## NON-LESIONAL PSO SAMPLE
+# PSO_Non_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct,  pt.size.factor = 2.5,  crop = TRUE,images = "ST_21_NL_Batch_6",cols = color.labels)
+
+## LESIONAL PSO SAMPLE
+# PSO_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5,  crop = TRUE,images = "ST_21_L_Batch_6",cols = color.labels)
+
+## LESIONAL PSA SAMPLE
+# PSA_LesionalSkinPatient1_Batch_1
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE,images = "ST_16_L_Batch_1",cols = color.labels)
+
+## NON-LESIONAL PSA SAMPLE
+
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE,images = "ST_16_NL_Batch_1",cols = color.labels)
+
+```
+
+

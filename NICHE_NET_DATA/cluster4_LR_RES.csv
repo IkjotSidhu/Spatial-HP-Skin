@@ -1,0 +1,20 @@
+﻿niche,sender,receiver,ligand,prioritization_score,receptor,top_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,ADIPOQ,0.682754301,ADIPOR1,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,THBS2,0.771364929,CD47,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,CD86,0.608498912,CTLA4,4Epidermis_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,DSG1,0.742679618,DSC2,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,DSG2,0.64863363,DSC2,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,EFNA1,0.773388464,EPHA2,4Epidermis_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,EFNA3,0.759101498,EPHA2,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,EFNA4,0.690899914,EPHA2,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,EFNA5,0.69319425,EPHA2,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,RARRES2,0.730796361,GPR1,4Epidermis_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,TPH1,0.626038184,HTR7,4Epidermis_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,IFNG,0.702114312,IFNGR1,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,ULBP2,0.591737184,KLRK1,4Epidermis_niche
+4Epidermis_niche,3 Epidermis,4 Epidermis,APOE,0.747689445,LDLR,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,LTB,0.706311206,LTBR,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,NLGN1,0.618725555,NRXN3,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,LAMA2,0.733041557,RPSA,4Epidermis_niche
+4Epidermis_niche,7 Epidermis,4 Epidermis,NGF,0.658608157,SORT1,4Epidermis_niche
+4Epidermis_niche,10 Suprabasal keratinocytes,4 Epidermis,CGA,0.598539391,VIPR1,4Epidermis_niche

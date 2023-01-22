@@ -1,0 +1,29 @@
+﻿niche,sender,receiver,ligand,prioritization_score,receptor,top_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,GPI,0.733831259,AMFR,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,DEFB4A,0.871108061,CCR6,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,DEFB4B,0.800384977,CCR6,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,COL1A1,0.888089592,CD44,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,FN1,0.774023829,CD44,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,HAS2,0.715886625,CD44,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,AREG,0.720785188,EGFR,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,BTC,0.735224453,EGFR,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,EREG,0.775610054,EGFR,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,GRN,0.746197775,EGFR,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,HBEGF,0.710332801,EGFR,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,TGFA,0.766961831,EGFR,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,FGF22,0.760473748,FGFR2,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,FGF9,0.71566236,FGFR3,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,COL18A1,0.749596114,GPC1,3Epidermis_niche
+3Epidermis_niche,4 Epidermis,3 Epidermis,IL1RN,0.786142872,IL1R2,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,ADAM9,0.725129583,ITGAV,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,COL4A1,0.722373893,ITGB1,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,C3,0.777071646,LRP1,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,PSAP,0.75989457,LRP1,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,TIMP1,0.725826916,LRP1,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,PSEN1,0.709196047,NOTCH3,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,SEMA4D,0.750447363,PLXNB2,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,NID1,0.750624764,PTPRF,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,LAMB2,0.803480739,RPSA,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,THBS1,0.744163184,SDC1,3Epidermis_niche
+3Epidermis_niche,7 Epidermis,3 Epidermis,RTN4,0.746270671,TNFRSF19,3Epidermis_niche
+3Epidermis_niche,10 Suprabasal keratinocytes,3 Epidermis,TNFSF12,0.730790029,TNFRSF25,3Epidermis_niche

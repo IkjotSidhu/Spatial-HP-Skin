@@ -1,0 +1,19 @@
+﻿niche,sender,receiver,ligand,prioritization_score,receptor,top_niche
+7Epidermis_niche,10 Suprabasal keratinocytes,7 Epidermis,CCL14,0.689299162,ACKR2,7Epidermis_niche
+7Epidermis_niche,10 Suprabasal keratinocytes,7 Epidermis,INHBA,0.655615288,ACVR1B,7Epidermis_niche
+7Epidermis_niche,10 Suprabasal keratinocytes,7 Epidermis,INHBB,0.665172146,ACVR1B,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,REN,0.695879433,ATP6AP2,7Epidermis_niche
+7Epidermis_niche,10 Suprabasal keratinocytes,7 Epidermis,MIF,0.724523649,CD74,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,CXCL1,0.664284545,CXCR2,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,CXCL8,0.647618452,CXCR2,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,EFNB1,0.721414896,EPHB6,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,EFNB2,0.695556079,EPHB6,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,L1CAM,0.660186375,ERBB3,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,NRG1,0.706983159,ERBB3,7Epidermis_niche
+7Epidermis_niche,10 Suprabasal keratinocytes,7 Epidermis,NRG2,0.680015864,ERBB3,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,F7,0.663020774,F3,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,IL19,0.731862468,IL20RB,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,IL20,0.714540869,IL20RB,7Epidermis_niche
+7Epidermis_niche,4 Epidermis,7 Epidermis,IL22,0.704944774,IL22RA1,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,JAG1,0.791853654,NOTCH3,7Epidermis_niche
+7Epidermis_niche,3 Epidermis,7 Epidermis,TNC,0.753531827,SDC1,7Epidermis_niche

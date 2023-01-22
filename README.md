@@ -22,44 +22,44 @@ Each notebook link will take you to the notebook with necessary code, please sel
 
 | FIGURE NO | NOTEBOOK LINK                                                                                                | DESCRIPTION                                                                      |
 |----------------------|------------------------|--------------------------|
-| 1B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | Spatial Plot - Healthy sample with cluster labels                                |
-| 1C        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | UMAP (Healthy samples only) - with spatial regions labels                        |
-| 1D        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md)               | Percentage composition (Healthy samples only)                                    |
-| 1E        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)    | Seurat Integeration (scRNA + ST data) showing cell type enrichment               |
-| 1G        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)    | MIA - healthy skin with dataset 1 (Hughes et al.) - Structural cell types only   |
-| 1H        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md)  | MIA - healthy skin with dataset 2 (Reynolds et al.) - Structural cell types only |
-| 1I        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART-4(SULLIVAN_DATA).Rmd) | MIA - healthy skin with dataset 3 (Sullivan et al.) - APCs and Preadiplocytes    |
+| 1B        | [link](../blob/upgrade/ST_HEALTHY_SAMPLES_PART_1_Final.md)               | Spatial Plot - Healthy sample with cluster labels                                |
+| 1C        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_1_Final.md)               | UMAP (Healthy samples only) - with spatial regions labels                        |
+| 1D        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_1_Final.md)               | Percentage composition (Healthy samples only)                                    |
+| 1E        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_Final.md)    | Seurat Integeration (scRNA + ST data) showing cell type enrichment               |
+| 1G        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_Final.md)    | MIA - healthy skin with dataset 1 (Hughes et al.) - Structural cell types only   |
+| 1H        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_3_REYNOLDS_DATA_Final.md)  | MIA - healthy skin with dataset 2 (Reynolds et al.) - Structural cell types only |
+| 1I        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_4_SULLIVAN_DATA.md) | MIA - healthy skin with dataset 3 (Sullivan et al.) - APCs and Preadiplocytes    |
 
 ### FIGURE 2
 
 | FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION                                                                  |
 |----------------------|------------------------|--------------------------|
-| 2A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   | MIA - healthy skin with dataset 1 (Hughes et al.) - Immune cell types only   |
-| 2B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) | MIA - healthy skin with dataset 2 (Reynolds et al.) - Immune cell types only |
+| 2A        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_Final.md)   | MIA - healthy skin with dataset 1 (Hughes et al.) - Immune cell types only   |
+| 2B        | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_3_REYNOLDS_DATA_Final.md) | MIA - healthy skin with dataset 2 (Reynolds et al.) - Immune cell types only |
 
 ### FIGURE 3
 
 | FIGURE NO | NOTEBOOK LINK                                                                        | DESCRIPTION                                                                    |
 |----------------------|----------------------|-----------------------------|
-| 3A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) | Spatial Plots with cluster labels - Lesional and Non-Lesional skin             |
-| 3B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) | UMAP - All samples combined (PS + Healthy skin) after Harmony batch correction |
-| 3C        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) | Percentage composition plots for different clusters / spatial regions          |
+| 3A        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) | Spatial Plots with cluster labels - Lesional and Non-Lesional skin             |
+| 3B        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) | UMAP - All samples combined (PS + Healthy skin) after Harmony batch correction |
+| 3C        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) | Percentage composition plots for different clusters / spatial regions          |
 
 ### FIGURE 5
 
 | FIGURE NO | NOTEBOOK LINK                                                                                      | DESCRIPTION                                                                                              |
 |-------------|----------------|-------------------------------------------|
-| 5A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_3_TRAVIS_DATA_.Rmd) | Spatial plots for cell type enrichment using (PS only) dataset 1 (Hughes et al.) - Structural cell types |
-| 5B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_3_TRAVIS_DATA_.Rmd) | MIA for (PS only) dataset 1 - Immune cell types                                                          |
-| 5E        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_3_TRAVIS_DATA_.Rmd) | B cell (From dataset 1) pathways                                                                         |
+| 5A        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_3_TRAVIS_DATA.md) | Spatial plots for cell type enrichment using (PS only) dataset 1 (Hughes et al.) - Structural cell types |
+| 5B        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_3_TRAVIS_DATA.md) | MIA for (PS only) dataset 1 - Immune cell types                                                          |
+| 5E        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_3_TRAVIS_DATA.md) | B cell (From dataset 1) pathways                                                                         |
 
 ### FIGURE 6
 
 | FIGURE NO | NOTEBOOK LINK                                                                                                | DESCRIPTION                                            |
 |-----------------|------------------------|------------------------------------|
-| 6A        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_.Rmd)  | Hierarchical clustering based heatmap for all samples  |
-| 6B        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_.Rmd)  | PCA plot for all samples - grouped by PS group         |
-| 6C        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_.Rmd)  | PCA plot for all samples - grouped by Disease severity |
+| 6A        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_Final.md)  | Hierarchical clustering based heatmap for all samples  |
+| 6B        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_Final.md)  | PCA plot for all samples - grouped by PS group         |
+| 6C        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_Final.md)  | PCA plot for all samples - grouped by Disease severity |
 
 ### FIGURE 7
 
@@ -73,51 +73,51 @@ Each notebook link will take you to the notebook with necessary code, please sel
 | FIGURE NO | NOTEBOOK LINK                                                                                  | DESCRIPTION                                                                |
 |----------------------|----------------------|----------------------------|
 | S2-B      |                                                                                                |                                                                            |
-| S2-C      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md) | Heat-map showing top 8 marker genes per cluster (Healthy sample data only) |
-| S2-D      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_FIGURE_1.md) | UMI counts                                                                 |
+| S2-C      | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_FIGURE_1_Final.md) | Heat-map showing top 8 marker genes per cluster (Healthy sample data only) |
+| S2-D      | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_FIGURE_1_Final.md) | UMI counts                                                                 |
 
 ### SUPPLEMENTARY FIGURE 3
 
 | FIGURE NO | NOTEBOOK LINK                                                                                               | DESCRIPTION                                                |
 |-----------------------|--------------------------|-----------------------|
-| S3-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_.md)   | UMAP - healthy skin with scRNA dataset 1 (Hughes et al.)   |
-| S3-B      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/ST_HEALTHY_SAMPLES_PART_3(REYNOLDS_DATA).md) | UMAP - healthy skin with scRNA dataset 2 (Reynolds et al.) |
+| S3-A      | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_2_TRAVIS_DATA_Final.md)   | UMAP - healthy skin with scRNA dataset 1 (Hughes et al.)   |
+| S3-B      | [link](../blob/upgrade/Final_Notebooks/ST_HEALTHY_SAMPLES_PART_3_REYNOLDS_DATA_Final.md) | UMAP - healthy skin with scRNA dataset 2 (Reynolds et al.) |
 
 ### SUPPLEMENTARY FIGURE 4
 
 | FIGURE NO | NOTEBOOK LINK                                                                                            | DESCRIPTION                                                        |
 |-------------------|----------------------|-------------------------------|
-| S4-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_1.md) (Anchor data UMAP)  | UMAP plots - Harmony batch correction vs Anchor batch correction   |
-| S4-A      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) (Harmony data UMAP) | UMAP plots - Harmony batch correction vs Anchor batch correction   |
-| S4-C      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_1.md) (Anchor data)       | Spatial plots- Harmony batch correction vs Anchor batch correction |
-| S4-C      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) (Harmony data)      | Spatial plots- Harmony batch correction vs Anchor batch correction |
+| S4-A      | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_1_Final.md) (Anchor data UMAP)  | UMAP plots - Harmony batch correction vs Anchor batch correction   |
+| S4-A      | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) (Harmony data UMAP) | UMAP plots - Harmony batch correction vs Anchor batch correction   |
+| S4-C      | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_1_Final.md) (Anchor data)       | Spatial plots- Harmony batch correction vs Anchor batch correction |
+| S4-C      | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) (Harmony data)      | Spatial plots- Harmony batch correction vs Anchor batch correction |
 
 ### SUPPLEMENTARY FIGURE 5
 
 | FIGURE NO | NOTEBOOK LINK                                                                        | DESCRIPTION                                                                              |
 |-------------------|--------------------------|----------------------------|
-| S5        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) | Heat-map showing top 10 marker genes per cluster (All samples) - Harmony batch corrected |
+| S5        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) | Heat-map showing top 10 marker genes per cluster (All samples) - Harmony batch corrected |
 
 ### SUPPLEMENTARY FIGURE 6
 
 | FIGURE NO | NOTEBOOK LINK                                                                        | DESCRIPTION                                                                             |
 |-------------------|---------------------------|---------------------------|
-| S6        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_1.md) | Heat-map showing top 10 marker genes per cluster (All samples) - Anchor batch corrected |
+| S6        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_1_Final.md) | Heat-map showing top 10 marker genes per cluster (All samples) - Anchor batch corrected |
 
 ### SUPPLEMENTARY FIGURE 7
 
 | FIGURE NO | NOTEBOOK LINK                                                                        | DESCRIPTION                                      |
 |---------------------|-----------------------------|----------------------|
-| S7-B      | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_2.md) | UMIs per clusters - Harmony batch corrected data |
+| S7-B      | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_2_Final.md) | UMIs per clusters - Harmony batch corrected data |
 
 ### SUPPLEMENTARY FIGURE 9
 
 | FIGURE NO | NOTEBOOK LINK                                                                                                 | DESCRIPTION                                               |
 |---------------------|-----------------------------|----------------------|
-| S9        | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_.Rmd)   | Dendogram for all samples based on pseudo-bulk expression |
+| S9        | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_Final.md)   | Dendogram for all samples based on pseudo-bulk expression |
 
 ### SUPPLEMENTARY FIGURE 10
 
 | FIGURE NO | NOTEBOOK LINK                                                                                                | DESCRIPTION                                    |
 |---------------------|------------------------|----------------------|
-| S10       | [link](https://github.com/IkjotSidhu/Spatial-HP-Skin/blob/main/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_.Rmd)  | PCA plots - per cluster bass (PS samples only) |
+| S10       | [link](../blob/upgrade/Final_Notebooks/PS_SAMPLES_PART_4_PSEUDO_BULK_ANALYSIS_Final.md)  | PCA plots - per cluster bass (PS samples only) |

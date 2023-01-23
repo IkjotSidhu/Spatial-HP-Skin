@@ -1,0 +1,290 @@
+---
+title: "PS SAMPLES PART 4"
+output: github_document
+---
+
+# PS SAMPLES PART 4
+
+## PSEUDO-BULK ANALYSIS
+
+### *DIFFERENTIAL TESTING BETWEEN CONDITIONS - LESIONAL, NON-LESIONAL AND HEALTHY*
+
+| FIGURE NO | DESCRIPTION                                                | LINK         |
+|--------------|---------------------------------------------|--------------|
+| 6A        | Hierarchical clustering based heatmap for all samples      | [link](#6a)  |
+| 6B        | PCA plot for all samples - grouped by PS group             | [link](#6b)  |
+| 6C        | PCA plot for all samples - grouped by Disease severity     | [link](#6c)  |
+| 8A        | PCA plot for - Cluster 1 (Dermis macrophages, fibroblasts) | [link](#8a)  |
+| 8B        | PCA plot for - Cluster 12 (Dermis lymphatics)              | [link](#8a)  |
+| S9        | Dendogram for all samples                                  | [link](#s10) |
+| S10       | PCA plots - per cluster basis (PS samples only)            | [link](#s10) |
+
+### LOAD PACKAGES
+
+```{r}
+library(DESeq2)
+library(Seurat)
+library(tidyverse)
+library(RColorBrewer)
+library(pheatmap)
+```
+
+### LOAD HELPER FUNCTIONS
+
+```{r}
+source("~/Desktop/Ikjot/Helper_Files/SPATIAL_FUNCTIONS.R")
+```
+
+### LOAD DATA
+
+```{r}
+# 1. All Spatial Samples with Harmony Batch Correction
+skin_data.hm.sct <- readRDS(file = "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/ALL_SPATIAL_SAMPLES(HM_BATCH_CORRECTED).RDS")
+
+# 2. All Spatial Samples Sample ID Meta Data
+meta.data <- read.csv("/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/Meta-Data/all_skin_corrected.meta.data.csv")
+skin_data.hm.sct$sample.id <- meta.data$sample.id
+```
+
+### RE-NORMALIZING TO REGRESS OUT BATCH
+
+```{r}
+skin_data.hm.sct_re_normalized <- SCTransform(skin_data.hm.sct,assay = "Spatial", new.assay.name ="SCT_BATCH_REGRESSED", vars.to.regress = c("sample.id"))
+```
+
+### IDENTIFY DE GENES - LESIONAL VS HEALTHY
+
+```{r,warning=FALSE,message=FALSE}
+LES_vs_HEALTHY_v1 <- FindMarkers(skin_data.hm.sct_re_normalized, group.by = "DISEASE_STATUS", ident.1 = "Lesional", ident.2 = "Healthy skin")
+LES_vs_HEALTHY_v2  <- FindMarkers(skin_data.hm.sct_re_normalized, group.by = "DISEASE_STATUS", ident.1 = "Lesional", ident.2 = "Healthy skin")
+
+NON_LES_vs_HEALTHY <- FindMarkers(skin_data.hm.sct_re_normalized, group.by = "DISEASE_STATUS", ident.1 = "Non-Lesional", ident.2 = "Healthy skin")
+LES_VS_NON_LES <- FindMarkers(skin_data.hm.sct_re_normalized, group.by = "DISEASE_STATUS", ident.1 = "Lesional", ident.2 = "Non-Lesional")
+```
+
+## PSEUDO-BULK APPROACH
+
+### Get Pseudocounts & View Summary
+
+```{r}
+# Get Pseudocoounts groupin by sample.id
+pseudo.counts <- Seurat:::PseudobulkExpression(object = skin_data.hm.sct, assays = "Spatial", group.by = "sample.id", slot = "counts", pb.method = "aggregate") 
+
+# Pseudo Counts Data Frame
+pseudo.counts.df <- as.data.frame(pseudo.counts$Spatial)
+
+# View Summary of pseudocounts
+summary(colSums(pseudo.counts$Spatial))
+```
+
+### Read & Process colData (Counts Meta Data)
+
+```{r}
+# Read PseudoBulk Meta Data, Filter Empty Sample IDs, & combine Group_1 & Severity into DISEASE_and_SEVERITY column
+groups.table <- read.csv(file="/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/Pseudo-Bulk-Data/groups.table.csv", stringsAsFactors = TRUE) %>% 
+  filter(Sample.ID!="") %>%
+  column_to_rownames("Sample.ID") %>%
+  unite("DISEASE_and_SEVERITY", "GROUP_I", "SEVERITY", sep = "_", remove = FALSE, na.rm = FALSE)
+
+# Add Sample IDs to be Sample.ID Column also
+groups.table['Sample.ID'] <- rownames(groups.table)
+```
+
+### Match Counts Data Columns with colData rows
+
+These need to be in the exact same order to create a DESeq2 Object
+
+```{r}
+# Match Samples (rownames) to be in same order as counts column names
+groups.table <- groups.table[match(colnames(pseudo.counts.df), rownames(groups.table)),]
+```
+
+# DESeq Workflow
+
+## 1. Create DESeq Object & Run DESeq2
+
+```{r,,warning=FALSE,message=FALSE}
+# 1. Create DESeq Object
+dds <- DESeqDataSetFromMatrix(countData = pseudo.counts.df, colData=groups.table, design = ~ BATCH + GROUP_I)
+
+# 2. Run DESeq2
+dds <- DESeq(dds, quiet = TRUE)
+```
+
+## 2. Generate Transformed Counts for Downstream Analysis
+
+```{r}
+# 1. Get Normalized Counts
+normalized.counts <- counts(dds, normalized=TRUE)
+colSums(normalized.counts)
+
+# 2. Variance Stabilized Transformation (VST) Object
+dds.vst <- vst(dds, blind=TRUE)
+```
+
+### FIGURE 6B / 6C <a id="6b"></a><a id="6c"></a>
+
+PCA plots showing clustering of samples based on disease group and severity / PASI score.
+
+```{r,fig.height = 12,fig.width = 12}
+# 1. PCA Plot grouping Skin Sample Type & Disease Status
+plotPCA(dds.vst, intgroup=c("GROUP_I", "GROUP_II")) + 
+  scale_color_manual(values=c("dimgray","#cc3333","#ffcc33","#ff9999","#ff9933"))
+
+# 2. PCA Plot Grouped by DISEASE_and_SEVERITY scaled by PASI score
+pcaData <- plotPCA(dds.vst, intgroup=c("SEVERITY", "PASI_SCORE", "DISEASE_and_SEVERITY", "Sample.ID"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+#pdf("ALL_SAMPLES_PCA_PLOT.pdf",height = 8,width = 10)
+ggplot(pcaData, aes(PC1, PC2, fill = PASI_SCORE, shape = DISEASE_and_SEVERITY)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ", percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ", percentVar[2], "% variance")) + 
+  coord_fixed() +
+  scale_shape_manual(values=c(21,22,23,24,25))
+#dev.off()
+```
+
+```{r,fig.height = 12,fig.width = 12}
+# 3. PCA Plot by DISEASE_and_SEVERITY Labeled Samples
+#pdf("ALL_SAMPLES_PCA_PLOT(WITH_SAMPLE_IDS).pdf",height = 15,width = 25 )
+ggplot(pcaData, aes(PC1, PC2,label=Sample.ID)) +
+  geom_point(size=3,mapping = aes(color=DISEASE_and_SEVERITY)) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed() + geom_text(hjust=0.5, vjust=0) + 
+  scale_color_manual(values=c("dimgray","#cc3333","#ffcc33","#ff9999","#ff9933"))
+#dev.off()
+```
+
+### FIGURE 6A <a id="6a"></a>
+
+### Hierarchical Clustering - Samples cluster by disease severity not systemic co-morbidity
+
+```{r,fig.height = 20,fig.width = 12}
+sampleDists <- dist(t(assay(dds.vst)))
+sampleDistMatrix <- as.matrix(sampleDists)
+
+rownames(sampleDistMatrix) <- paste(dds.vst$GROUP_I, dds.vst$SEVERITY,dds.vst$GROUP_II, sep="-")
+colnames(sampleDistMatrix) <- NULL
+
+colors <- colorRampPalette(brewer.pal(9, "RdYlBu")) (255)
+
+#pdf("HC_WITH_HEATMAP.pdf",height = 15,width = 15)
+print(pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors))
+#dev.off()
+```
+
+### FIGURE S9 <a id="s9"></a>
+
+## DENDOGRAM
+
+```{r,fig.height = 25,fig.width = 15}
+hc <- hclust(sampleDists)
+
+## Printing dendogram with - Disease Severity
+print(plot(hc, labels=paste(dds.vst$GROUP_I, dds.vst$SEVERITY, dds.vst$GROUP_II,dds.vst$PASI_SCORE, sep = ":")))
+
+## Printing Dendogram - with sample ids
+#pdf("DENDOGRAM-WITH-SAMPLE-IDS.pdf",height = 14,width=10)
+plot(hc, labels=paste(dds.vst$GROUP_I, dds.vst$Sample.ID, dds.vst$GROUP_II,dds.vst$PASI_SCORE, sep = ":"))
+#dev.off() 
+```
+
+### Figure S9 <a id="s9"></a>
+
+### CLUSTER SPECIFIC (PSEUDO-BULK) PCA-plots
+
+#### PART 1
+
+```{r}
+# 1. All Cluster Labels
+cluster.labels <- unique(skin_data.hm.sct@meta.data$Spatial.regions) %>% 
+  as.vector() %>% 
+  sort(decreasing = TRUE)
+
+# 2. Cluster Labels for Specific Groups of Interest
+cluster.labels.filtered <- c("9 Adipose","10 Suprabasal keratinocytes","11 Smooth muscle","12 Endothelial cells",
+                             "13 Immunoglobulins, fibroblasts","14 Smooth muscle","15 Mixed","16 Adipose, fibroblasts")
+```
+
+```{r,warning=FALSE,message=FALSE,fig.height = 12,fig.width = 12}
+# 1. File Path for Groups Table CSV
+groups.tbl.path <- "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/Pseudo-Bulk-Data/groups.table.csv"
+
+for(x in cluster.labels){
+  subset.data <- subset(skin_data.hm.sct,Spatial.regions %in% c(x))
+  dds <- pseudo_bulk_out(subset.data, group_label = "sample.id", groups_tbl_path = groups.tbl.path)
+  if(!is.null(dds)){
+    tryCatch({
+      dds.vst <- vst(dds, blind=TRUE)
+      
+      # ALL PSORIASIS SAMPLES
+      dds.vst_subset <- dds.vst[ ,dds.vst$GROUP_I %in% c("Lesional","Non-Lesional")]
+      
+      ## PCA PLOT
+      #pdf(file=paste("PSEUDO_BULK_OUTPUT/ALL_PS_SAMPLES/",x,"_PCA_PLOT_PSEUDOBULK_ALL_SAMPLES.pdf"),height = 8,width = 10)
+      print(plotPCA(dds.vst_subset, intgroup=c("GROUP_I", "SEVERITY"))+ ggtitle(paste("PCA Plot for -",x)) + 
+              scale_color_manual(values=c("#ff9999","#cc3333","#ffcc33","#ff9933")))
+      #dev.off()
+      
+    }, error=function(e){ skip_to_next <<- TRUE})
+  }
+}
+```
+
+#### PART-2
+
+```{r,warning=FALSE,message=FALSE,fig.height = 12,fig.width = 12}
+for(x in cluster.labels.filtered) {
+  subset.data <- subset(skin_data.hm.sct,Spatial.regions %in% c(x))
+  dds <- pseudo_bulk_out(subset.data,group_label = "sample.id", groups_tbl_path = groups.tbl.path)
+  if(!is.null(dds)){
+    tryCatch({
+      dds.vst <- vst(dds, blind=TRUE,nsub = 100)
+      normalized.counts <- counts(dds, normalized=TRUE)
+      
+      # ONLY PSORIASIS SAMPLES
+      dds.vst_subset <- dds.vst[ ,dds.vst$GROUP_I %in% c("Lesional","Non-Lesional")]
+      
+      ## PCA PLOT
+      #pdf(file=paste("PSEUDO_BULK_OUTPUT/ALL_SAMPLES(VERSION_2)/",x,"_PCA_PLOT_PSEUDOBULK_ALL_SAMPLES.pdf"),height = 8,width = 10)
+      print(plotPCA(dds.vst_subset, intgroup=c("GROUP_I", "SEVERITY"))+ ggtitle(paste("PCA Plot for -",x)) +
+              scale_color_manual(values=c("#ff9999","#cc3333","#ffcc33","#ff9933"))) 
+      #dev.off()
+      
+    }, error=function(e){ skip_to_next <<- TRUE})
+  }
+}
+```
+
+### FIGURE 8A and 8B<a id="8a"></a>
+
+```{r,warning=FALSE,message=FALSE,fig.height = 12,fig.width = 12}
+subset.data <- subset(skin_data.hm.sct,Spatial.regions %in% c("1 Macs + fibroblasts"))
+
+dds <- pseudo_bulk_out(subset.data,group_label = "sample.id", groups_tbl_path = groups.tbl.path)
+
+dds.vst <- vst(dds, blind=TRUE, nsub = 100)
+
+# ALL PSORIASIS SAMPLES
+dds.vst_subset_2 <- dds.vst[,dds.vst$GROUP_I %in% c("Lesional","Non-Lesional")]
+#pdf(file=paste("PSEUDO_BULK_OUTPUT/ALL_PS_SAMPLES/","1 Macs + fibroblasts","_PCA_PLOT_PSEUDOBULK_ALL_SAMPLES(WITH_LABELS)(V2).pdf"),height = 8,width = 10)
+plotPCA(dds.vst_subset_2, intgroup=c("GROUP_I", "SEVERITY")) + geom_text(label = dds.vst_subset_2$PASI_SCORE,nudge_x = 0.50, nudge_y = 1) + scale_color_manual(values=c("#ff9999","#cc3333","#ffcc33","#ff9933"))
+#dev.off()
+
+#12 Endothelial cells
+subset.data <- subset(skin_data.hm.sct,Spatial.regions %in% c("12 Endothelial cells"))
+dds <- pseudo_bulk_out(subset.data,group_label = "sample.id", groups_tbl_path = groups.tbl.path)
+dds.vst <- vst(dds, blind=TRUE,nsub = 100)
+
+# ALL PSORIASIS SAMPLES
+dds.vst_subset_2 <- dds.vst[ ,dds.vst$GROUP_I %in% c("Lesional","Non-Lesional")]
+
+#pdf(file=paste("PSEUDO_BULK_OUTPUT/ALL_PS_SAMPLES/","12 Endothelial cells","_PCA_PLOT_PSEUDOBULK_ALL_SAMPLES(WITH_LABELS)(V2).pdf"),height = 8,width = 10)
+plotPCA(dds.vst_subset_2, intgroup=c("GROUP_I", "SEVERITY")) + geom_text(label = dds.vst_subset_2$PASI_SCORE,nudge_x = 0.50, nudge_y = 1)  + scale_color_manual(values=c("#ff9999","#cc3333","#ffcc33","#ff9933"))
+#dev.off()
+```

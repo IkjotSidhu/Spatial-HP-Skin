@@ -1,0 +1,377 @@
+---
+title: "R Notebook"
+output: github_document
+---
+
+# PSO + PSA + NORMAL SKIN COMBINED ANALYSIS - PART 2
+
+# CONTINUED
+
+## Harmony-batch correction
+
+## Table of content
+
+| FIGURE NO | DESCRIPTION                                                             | LINK                       |
+|----------|-----------------------------------|------------------------|
+| S4A       | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B and S4A]        |
+| 3B        | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B]                |
+| 3A        | NON-LESIONAL SKIN SAMPLE (ST 21 NL), and LESIONAL SKIN SAMPLE (ST 22 L) | [FIGURE 3A ]               |
+| S5        | Heatmap (After Harmony batch correction)                                | [SUPPLEMENTARY FIGURE S5 ] |
+| 3C        | Percentage composition                                                  | [FIGURE 3C]                |
+| S7B       | UMIs per cluster                                                        | [FIGURE S7B]               |
+
+## LOAD ALL PACKAGES
+
+```{r}
+library(tidyverse)
+library(Seurat)
+library(cowplot)
+library(ggsci)
+library(ggpubr)
+library(harmony)
+```
+
+## LOAD DATA (Generated in PS_SAMPLES_PART_1)
+
+```{r,eval=FALSE}
+All_Samples <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/All_Samples_list.RDS")
+```
+
+### Merging data for Harmony Batch correction
+
+```{r,eval=FALSE}
+all_skin.merge <- merge(x=All_Samples[[1]], y=All_Samples[-1], merge.data=TRUE)
+```
+
+### Save RDS File of All Merged Samples
+
+```{r}
+#saveRDS(all_skin.merge, file = "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/all_samples_merged_obj.RDS")
+```
+
+### Load All Merged Samples & Run SCTransform
+
+```{r}
+all_skin.merge <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/all_samples_merged_obj.RDS")
+
+all_skin.merge <- SCTransform(all_skin.merge,assay = "Spatial", vars.to.regress = "sample.id")
+all_skin.merge <- RunPCA(all_skin.merge,assay = "SCT")
+```
+
+## Code for the final figure
+
+### Running Harmony batch correction
+
+```{r}
+all_samples.hm.sct <- RunHarmony(all_skin.merge,assay.use = "SCT",project.dim = FALSE,group.by.vars = "sample.id")
+```
+
+```{r}
+ElbowPlot(all_samples.hm.sct,ndims = 50)
+```
+
+```{r}
+all_samples.hm.sct <- all_samples.hm.sct %>% 
+    RunUMAP(reduction = "harmony", dims = 1:40) %>% 
+    FindNeighbors(reduction = "harmony", dims = 1:40) %>% 
+    FindClusters(resolution = 0.4) %>% 
+    identity()
+```
+
+```{r}
+DimPlot(all_samples.hm.sct)
+```
+
+```{r}
+DimPlot(all_samples.hm.sct,split.by = "DISEASE_STATUS")
+```
+
+## IMPORT Pre-computed harmony results to get same embeddings and cluster labels as presented in the paper.
+
+Pre-computed harmony batch results used in the final manuscript
+
+```{r}
+skin_data.hm.sct <- readRDS(file="/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/ALL_SPATIAL_SAMPLES(HM_BATCH_CORRECTED).RDS")
+```
+
+```{r}
+DimPlot(skin_data.hm.sct)
+```
+
+```{r}
+## COLOR FOR LABELS
+color.labels.heatmap <- c("#87CEFA",
+"#4876FF",
+"#CD853F",
+"#BF96FF",
+"#FF0000",
+"#CAF178",
+"#E0BFB6",
+"#68228B",
+"#7B0000",
+"#FFC71A",
+"#C355A0",
+"#00B923",
+"#8B5A2B",
+"#838B8B",
+"#005947",
+"#C1CDCD",
+"#FF7545")
+```
+
+## Find Markers for Each Cluster & Plot Heat Map of Top 10 Markers Per Cluster
+
+```{r,fig.height=22,fig.width=15}
+DefaultAssay(skin_data.hm.sct) <- "SCT"
+Idents(skin_data.hm.sct) <- "seurat_clusters"
+skin_data.hm.sct.markers <- FindAllMarkers(skin_data.hm.sct, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "SCT") %>% filter(p_val_adj<0.05)
+
+top10 <- skin_data.hm.sct.markers %>%
+    group_by(cluster) %>%
+    filter(gene %in% rownames(skin_data.hm.sct@assays$SCT@scale.data)) %>%
+    top_n(n = 10, wt = avg_log2FC)
+
+DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT",group.colors = color.labels.heatmap,angle=90) + NoLegend()
+```
+
+### Defining cluster labels based on marker genes
+
+```{r}
+## ADDING CLUSTER LABELS
+cluster.labels <- c("0 Fibroblasts",
+"1 Macs + fibroblasts",
+"2 Eccrine + melanocyte precursors",
+"3 Epidermis",
+"4 Epidermis",
+"5 Connective tissue",
+"6 Mixed",
+"7 Epidermis",
+"8 Hair follicle and sebaceous glands",
+"9 Adipose",
+"10 Suprabasal keratinocytes",
+"11 Smooth muscle",
+"12 Endothelial cells",
+"13 Immunoglobulins, fibroblasts",
+"14 Smooth muscle",
+"15 Mixed",
+"16 Adipose, fibroblasts")
+
+## COLOR FOR LABELS
+color.labels <- c("0 Fibroblasts"="#87CEFA",
+"1 Macs + fibroblasts"="#4876FF",
+"2 Eccrine + melanocyte precursors"="#CD853F",
+"3 Epidermis"="#BF96FF",
+"4 Epidermis"="#FF0000",
+"5 Connective tissue"="#CAF178",
+"6 Mixed"="#E0BFB6",
+"7 Epidermis"="#68228B",
+"8 Hair follicle and sebaceous glands"="#7B0000",
+"9 Adipose"="#FFC71A",
+"10 Suprabasal keratinocytes"="#C355A0",
+"11 Smooth muscle"="#00B923",
+"12 Endothelial cells"="#8B5A2B",
+"13 Immunoglobulins, fibroblasts"="#838B8B",
+"14 Smooth muscle"="#005947",
+"15 Mixed"="#C1CDCD",
+"16 Adipose, fibroblasts"="#FF7545")
+```
+
+```{r}
+names(cluster.labels) <- levels(skin_data.hm.sct)
+skin_data.hm.sct <- RenameIdents(skin_data.hm.sct, cluster.labels)
+skin_data.hm.sct[["Spatial.regions"]] <- Idents(object = skin_data.hm.sct)
+Idents(skin_data.hm.sct) <- "Spatial.regions"
+```
+
+```{r,fig.height=5,fig.width=10}
+DimPlot(skin_data.hm.sct, split.by="DISEASE_STATUS",cols=color.labels, pt.size=3.5)
+```
+
+## FIGURE 3B and S4A
+
+## FIGURE 3B {data-link="FIGURE 3B and S4A"}
+
+### UMAP WITH ALL SPATIAL SAMPLES (AFTER HARMONY BATCH CORRECTION)
+
+<a id="3b">
+
+```{r,fig.height=7,fig.width=10}
+DimPlot(skin_data.hm.sct, cols=color.labels, pt.size=3.5)
+```
+
+</a>
+
+## FIGURE 3A 
+
+### NON-LESIONAL SKIN SAMPLE (ST 21 NL)
+
+<a id="3a">
+
+```{r}
+SpatialDimPlot(skin_data.hm.sct,images = c("ST_21_NL_Batch_6"),cols=color.labels,pt.size.factor = 2.5)
+```
+
+## FIGURE 3A
+
+### LESIONAL SKIN SAMPLE (ST 22 L)
+
+```{r}
+SpatialDimPlot(skin_data.hm.sct,images = c("ST_22L_Batch_8"),cols=color.labels,pt.size.factor = 2.5)
+```
+
+</a>
+
+### LESIONAL SKIN SAMPLE (ST 22 L)
+
+```{r}
+SpatialDimPlot(skin_data.hm.sct,images = c("ST_22L_Batch_8"), cols=color.labels,pt.size.factor = 2.5)
+```
+
+```{r}
+#pdf(width = 8,height=10,file = "HEALTHY_FEMALE_SAMPLE_1_R2_SPATIAL_PLOT(HM_CORRECTED).pdf")
+SpatialDimPlot(skin_data.hm.sct, images="ST.HF.1.R2", cols = color.labels,pt.size.factor = 2.4)
+#dev.off()
+```
+
+### Get Top Markers for Harmony Batch Corrected Samples With Labeled Clusters
+
+```{r}
+DefaultAssay(skin_data.hm.sct) <- "SCT"
+Idents(skin_data.hm.sct) <- "Spatial.regions"
+
+top10 <- skin_data.hm.sct.markers %>%
+    group_by(cluster) %>%
+    filter(gene %in% rownames(skin_data.hm.sct@assays$SCT@scale.data)) %>%
+    top_n(n = 10, wt = avg_log2FC)
+```
+
+## SUPPLEMENTARY FIGURE S5 
+
+### HEATMAP showing top marker genes after Harmony batch correction
+
+<a id="s5">
+
+```{r,fig.height=20,fig.width=14}
+DoHeatmap(skin_data.hm.sct, features = top10$gene,assay = "SCT", group.colors = color.labels,angle=90) + NoLegend()
+```
+
+</a>
+
+### Fraction of spots per group (DISEASE STATUS)
+
+```{r}
+seurat_clusters.df.v2 <- table(skin_data.hm.sct@active.ident, skin_data.hm.sct@meta.data$DISEASE_STATUS,skin_data.hm.sct@meta.data$sample.id) %>% as.data.frame() %>%
+  dplyr::rename(Cluster_id=Var1,Group=Var2,Sample_id=Var3) %>% filter(Freq!=0)  %>% group_by(Sample_id)%>% mutate(Fraction=Freq*100/sum(Freq)) %>% mutate(SUM_OF_FRACTIONS=sum(Fraction)) 
+```
+
+## FIGURE 3C
+
+### PERCENTAGE COMPOSITION PLOT
+
+<a id="3c">
+
+```{r,fig.height=20,fig.width=7}
+black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+ggplot(seurat_clusters.df.v2,aes(x=Group,y=Freq,fill=Cluster_id)) + geom_bar(stat="identity",position="fill") + ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks)) + scale_fill_manual(values = color.labels)
+```
+
+</a>
+
+### FIGURE S7B
+
+### (1) UMIs per cluster
+
+<a id="s7b">
+
+### (2) Number of genes expressed per cluster
+
+```{r fig.height=12,fig.width=12}
+VlnPlot(skin_data.hm.sct,features =  "nFeature_Spatial") + scale_fill_manual(values = color.labels)
+
+VlnPlot(skin_data.hm.sct,features =  "nCount_Spatial") + scale_fill_manual(values = color.labels)
+```
+
+</a>
+
+```{r, eval=FALSE}
+#saveRDS(skin_data.hm.sct.markers, "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/ALL_ST_HARMONY_ALIGNED_MARKERS.RDS")
+```
+
+## Spatial plots with cluster labels
+
+```{r}
+Images(skin_data.hm.sct)
+```
+
+```{r}
+## HEALTHY SAMPLE
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE, images = "ST.HF.1.R2", cols = color.labels) 
+
+## NON-LESIONAL PSO SAMPLE
+# PSO_Non_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct,  pt.size.factor = 2.5, crop = TRUE, images = "ST_21_NL_Batch_6", cols = color.labels)
+
+## LESIONAL PSO SAMPLE
+# PSO_Lesional_Patient5_Batch_6 (SAMPLE ID NEEDS TO BE CORRECTED)
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE, images = "ST_21_L_Batch_6", cols = color.labels)
+
+## LESIONAL PSA SAMPLE
+# PSA_LesionalSkinPatient1_Batch_1
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE, images = "ST_16_L_Batch_1", cols = color.labels)
+
+## NON-LESIONAL PSA SAMPLE
+SpatialDimPlot(skin_data.hm.sct, pt.size.factor = 2.5, crop = TRUE, images = "ST_16_NL_Batch_1", cols = color.labels)
+```
+
+## ALTERNATIVE APPROACH
+
+Not used in the final manuscript
+
+```{r,eval=FALSE}
+all_skin.list <-  lapply(X = All_Samples, 
+                       FUN = SCTransform, 
+                       method = "glmGamPoi", 
+                       return.only.var.genes = FALSE,assay="Spatial",verbose=FALSE)
+
+features <- SelectIntegrationFeatures(object.list = all_skin.list, nfeatures = 7500)
+all_skin.merge <- merge(x=all_skin.list[[1]],y=all_skin.list[2:length(all_skin.list)], merge.data=TRUE)
+
+VariableFeatures(all_skin.merge) <- features
+all_skin.merge <- RunPCA(all_skin.merge,assay = "SCT")
+all_samples.hm.sct <- RunHarmony(all_skin.merge,assay.use = "SCT",project.dim = FALSE, group.by.vars = "sample.id")
+```
+
+```{r,eval=FALSE}
+all_samples.hm.sct <- all_samples.hm.sct %>% 
+    RunUMAP(reduction = "harmony", dims = 1:40) %>% 
+    FindNeighbors(reduction = "harmony", dims = 1:40) %>% 
+    FindClusters(resolution = 0.5) %>% 
+    identity()
+```
+
+```{r,eval=FALSE}
+DimPlot(all_samples.hm.sct, split.by = "DISEASE_STATUS")
+```
+
+### Fraction of spots per group (DISEASE STATUS)
+
+```{r,eval=FALSE}
+seurat_clusters.df.v1 <- table(all_samples.hm.sct@active.ident, all_samples.hm.sct@meta.data$DISEASE_STATUS,all_samples.hm.sct@meta.data$sample.id) %>% 
+  as.data.frame() %>%
+  dplyr::rename(Cluster_id=Var1,Group=Var2,Sample_id=Var3) %>% 
+  filter(Freq!=0) %>% 
+  group_by(Sample_id) %>% 
+  mutate(Fraction=Freq*100/sum(Freq)) %>% 
+  mutate(SUM_OF_FRACTIONS=sum(Fraction)) 
+```
+
+```{r,fig.height=20,fig.width=7,eval=FALSE}
+black.bold.16.text <- element_text(face = "bold", color = "black", size = 14,angle = 90, vjust = 0.5, hjust=1)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+ggplot(seurat_clusters.df.v1,aes(x=Group,y=Freq,fill=Cluster_id)) + geom_bar(stat="identity",position="fill") + ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank(),axis.text.x =black.bold.16.text) + scale_y_continuous(breaks = brks, labels = scales::percent(brks))
+```

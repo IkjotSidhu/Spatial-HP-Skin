@@ -443,13 +443,9 @@ all_healthy_samples.hm.sct <- all_healthy_samples.hm.sct %>%
 all_healthy_samples.hm.sct <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_(Harmonized_for_final_figure).RDS")
 ```
 
-### View UMAP
 
-```{r}
-#pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_FINAL).pdf")
-DimPlot(all_healthy_samples.hm.sct, pt.size = 3.5, cols = custom_colors)
-#dev.off()
-```
+
+<a id="s3a">
 
 ### Find All Markers for Harmonized Healthy Samples
 
@@ -470,7 +466,18 @@ DoHeatmap(all_healthy_samples.hm.sct, features = top8$gene,assay = "SCT", group.
 #dev.off()
 ```
 
-### Generate Spatial plot for all samples
+</a>
+
+<a id="s3b">
+### View UMAP
+
+```{r}
+#pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_FINAL).pdf")
+DimPlot(all_healthy_samples.hm.sct, pt.size = 3.5, cols = custom_colors)
+#dev.off()
+```
+
+### Percentage composition plot
 
 ```{r,fig.height=10,fig.width=10}
 Regions.df <- table(all_healthy_samples.hm.sct@meta.data$seurat_clusters, all_healthy_samples.hm.sct@meta.data$sample.id) %>% 
@@ -496,6 +503,8 @@ SpatialDimPlot(all_healthy_samples.hm.sct, images="HV2.S1.R2", pt.size.factor = 
   scale_fill_manual(values = custom_colors) 
 #dev.off()
 ```
+
+</a>
 
 ## Alternative approach
 
@@ -537,7 +546,7 @@ all_healthy_samples.hm.sct.alt <- all_healthy_samples.hm.sct.alt %>%
 #saveRDS(all_healthy_samples.hm.sct.alt, file="/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST(Harmonized_Alt_Approach).RDS")
 ```
 
-## Alternative Harmony Approach Plots
+## Alternative Harmony approach (Not used in the final manuscript)
 
 ### Load RDS File
 
@@ -568,8 +577,6 @@ for(x in images){
 
 ### Top Marker Genes Heat Map
 
-<a id="s3a">
-
 ```{r ,fig.height=12, fig.width=10}
 all_healthy_samples.hm.sct.alt <- PrepSCTFindMarkers(all_healthy_samples.hm.sct.alt,assay = "SCT")
 Idents(all_healthy_samples.hm.sct.alt) <- "seurat_clusters"
@@ -587,8 +594,6 @@ print(DoHeatmap(all_healthy_samples.hm.sct.alt, features = top8$gene,assay = "SC
 #dev.off()
 ```
 
-</a>
-
 ### Assign Cluster Labels
 
 ```{r}
@@ -601,19 +606,13 @@ all_healthy_samples.hm.sct.alt[["Spatial.regions"]] <- Idents(object = all_healt
 
 ### Plot UMAP
 
-<a id="s3b">
-
 ```{r}
 #pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
 DimPlot(all_healthy_samples.hm.sct.alt,cols = custom_colors_alt, pt.size = 3.5)
 #dev.off(){r}
 ```
 
-</a>
-
 ### Percentage plot for different spatial regions
-
-<a id="s3c">
 
 ```{r,fig.height=10,fig.width=10}
 Regions.df <- table(all_healthy_samples.hm.sct.alt@meta.data$Spatial.regions,all_healthy_samples.hm.sct.alt@meta.data$sample.id) %>% 
@@ -632,5 +631,3 @@ ggplot(Regions.df,aes(x=Sample,y=Freq,fill=Spatial_Region)) + geom_bar(stat="ide
   ylab("% Composition of Sample by Spatial Region / Clusters")
 #dev.off()
 ```
-
-</a>

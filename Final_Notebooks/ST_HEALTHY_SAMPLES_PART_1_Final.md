@@ -237,6 +237,11 @@ source("../SPATIAL_FUNCTIONS.R")
 
     ## 
 
+### Home directory for processed files
+
+Please replace the home directory location to allow the files to be
+easily accessible
+
 ### Import Healthy Samples
 
 (Raw Data stored in GEO repo: GSE202011)
@@ -509,7 +514,7 @@ top8 <- new.skin.combined.markers %>%
 
 ``` r
 # Save Healthy Skin Markers RDS File (Used later in Healthy Samples Part 2 & 4)
-saveRDS(new.skin.combined.markers, "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_MARKERS.RDS")
+saveRDS(new.skin.combined.markers, "/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_MARKERS.RDS")
 ```
 
 <a id="s2c"></a>
@@ -547,7 +552,7 @@ new.skin.combined <- StashIdent(new.skin.combined, save.name = "Spatial.regions"
 ### Save RDS file skin.new.combined with cluster ids
 
 ``` r
-#saveRDS(new.skin.combined, "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_SKIN_SAMPLES_ST_CLUSTERS_LABELED.RDS")
+#saveRDS(new.skin.combined, "/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_SKIN_SAMPLES_ST_CLUSTERS_LABELED.RDS")
 ```
 
 ``` r
@@ -766,7 +771,7 @@ healthy_skin.merge <- SCTransform(healthy_skin.merge, assay = "Spatial", vars.to
 
     ## Calculating gene attributes
 
-    ## Wall clock passed: Time difference of 50.41422 secs
+    ## Wall clock passed: Time difference of 44.0182 secs
 
     ## Determine variable features
 
@@ -859,26 +864,26 @@ all_healthy_samples.hm.sct <- all_healthy_samples.hm.sct %>%
     ## To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
     ## This message will be shown once per session
 
-    ## 18:07:10 UMAP embedding parameters a = 0.9922 b = 1.112
+    ## 16:25:37 UMAP embedding parameters a = 0.9922 b = 1.112
 
-    ## 18:07:10 Read 3815 rows and found 20 numeric columns
+    ## 16:25:37 Read 3815 rows and found 20 numeric columns
 
-    ## 18:07:10 Using Annoy for neighbor search, n_neighbors = 30
+    ## 16:25:37 Using Annoy for neighbor search, n_neighbors = 30
 
-    ## 18:07:10 Building Annoy index with metric = cosine, n_trees = 50
+    ## 16:25:37 Building Annoy index with metric = cosine, n_trees = 50
 
     ## 0%   10   20   30   40   50   60   70   80   90   100%
 
     ## [----|----|----|----|----|----|----|----|----|----|
 
     ## **************************************************|
-    ## 18:07:11 Writing NN index file to temp file /var/folders/8p/2clwbcfn719f5l1kjsyx4v6s2r9kgj/T//RtmpDkazXq/file12efc20e2ebc3
-    ## 18:07:11 Searching Annoy index using 1 thread, search_k = 3000
-    ## 18:07:12 Annoy recall = 100%
-    ## 18:07:12 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-    ## 18:07:13 Initializing from normalized Laplacian + noise (using irlba)
-    ## 18:07:14 Commencing optimization for 500 epochs, with 170830 positive edges
-    ## 18:07:20 Optimization finished
+    ## 16:25:38 Writing NN index file to temp file /var/folders/8p/2clwbcfn719f5l1kjsyx4v6s2r9kgj/T//RtmpajBuSh/filea1ef2a7b62b4
+    ## 16:25:38 Searching Annoy index using 1 thread, search_k = 3000
+    ## 16:25:39 Annoy recall = 100%
+    ## 16:25:39 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+    ## 16:25:40 Initializing from normalized Laplacian + noise (using irlba)
+    ## 16:25:40 Commencing optimization for 500 epochs, with 170830 positive edges
+    ## 16:25:47 Optimization finished
     ## Computing nearest neighbor graph
     ## Computing SNN
 
@@ -894,7 +899,7 @@ all_healthy_samples.hm.sct <- all_healthy_samples.hm.sct %>%
 
 ``` r
 # Save Harmonized Healthy Samples
-#saveRDS(all_healthy_samples.hm.sct, "/gpfs/data/naiklab/Alex/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_(Harmonized_for_final_figure).RDS")
+#saveRDS(all_healthy_samples.hm.sct, "/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_(Harmonized_for_final_figure).RDS")
 ```
 
 ### Load Harmonized Healthy Samples
@@ -903,18 +908,7 @@ all_healthy_samples.hm.sct <- all_healthy_samples.hm.sct %>%
 all_healthy_samples.hm.sct <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_(Harmonized_for_final_figure).RDS")
 ```
 
-### View UMAP
-
-``` r
-#pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_FINAL).pdf")
-DimPlot(all_healthy_samples.hm.sct, pt.size = 3.5, cols = custom_colors)
-```
-
-![](ST_HEALTHY_SAMPLES_PART_1_Final_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
-
-``` r
-#dev.off()
-```
+<a id="s3a">
 
 ### Find All Markers for Harmonized Healthy Samples
 
@@ -962,13 +956,28 @@ DoHeatmap(all_healthy_samples.hm.sct, features = top8$gene,assay = "SCT", group.
     ## = "SCT", : The following features were omitted as they were not found in the
     ## scale.data slot for the SCT assay: HLA-E
 
+![](ST_HEALTHY_SAMPLES_PART_1_Final_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+
+``` r
+#dev.off()
+```
+
+</a>
+
+<a id="s3b"> \### View UMAP
+
+``` r
+#pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_FINAL).pdf")
+DimPlot(all_healthy_samples.hm.sct, pt.size = 3.5, cols = custom_colors)
+```
+
 ![](ST_HEALTHY_SAMPLES_PART_1_Final_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
 ``` r
 #dev.off()
 ```
 
-### Generate Spatial plot for all samples
+### Percentage composition plot
 
 ``` r
 Regions.df <- table(all_healthy_samples.hm.sct@meta.data$seurat_clusters, all_healthy_samples.hm.sct@meta.data$sample.id) %>% 
@@ -1007,6 +1016,8 @@ SpatialDimPlot(all_healthy_samples.hm.sct, images="HV2.S1.R2", pt.size.factor = 
 ``` r
 #dev.off()
 ```
+
+</a>
 
 ## Alternative approach
 
@@ -1102,26 +1113,26 @@ all_healthy_samples.hm.sct.alt <- all_healthy_samples.hm.sct.alt %>%
     identity()
 ```
 
-    ## 18:09:30 UMAP embedding parameters a = 0.9922 b = 1.112
+    ## 16:27:48 UMAP embedding parameters a = 0.9922 b = 1.112
 
-    ## 18:09:30 Read 3815 rows and found 40 numeric columns
+    ## 16:27:48 Read 3815 rows and found 40 numeric columns
 
-    ## 18:09:30 Using Annoy for neighbor search, n_neighbors = 30
+    ## 16:27:48 Using Annoy for neighbor search, n_neighbors = 30
 
-    ## 18:09:30 Building Annoy index with metric = cosine, n_trees = 50
+    ## 16:27:48 Building Annoy index with metric = cosine, n_trees = 50
 
     ## 0%   10   20   30   40   50   60   70   80   90   100%
 
     ## [----|----|----|----|----|----|----|----|----|----|
 
     ## **************************************************|
-    ## 18:09:31 Writing NN index file to temp file /var/folders/8p/2clwbcfn719f5l1kjsyx4v6s2r9kgj/T//RtmpDkazXq/file12efc271c7260
-    ## 18:09:31 Searching Annoy index using 1 thread, search_k = 3000
-    ## 18:09:32 Annoy recall = 100%
-    ## 18:09:32 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-    ## 18:09:33 Initializing from normalized Laplacian + noise (using irlba)
-    ## 18:09:33 Commencing optimization for 500 epochs, with 179546 positive edges
-    ## 18:09:40 Optimization finished
+    ## 16:27:48 Writing NN index file to temp file /var/folders/8p/2clwbcfn719f5l1kjsyx4v6s2r9kgj/T//RtmpajBuSh/filea1efb217d5a
+    ## 16:27:48 Searching Annoy index using 1 thread, search_k = 3000
+    ## 16:27:49 Annoy recall = 100%
+    ## 16:27:50 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+    ## 16:27:51 Initializing from normalized Laplacian + noise (using irlba)
+    ## 16:27:51 Commencing optimization for 500 epochs, with 179546 positive edges
+    ## 16:27:57 Optimization finished
     ## Computing nearest neighbor graph
     ## Computing SNN
 
@@ -1139,7 +1150,7 @@ all_healthy_samples.hm.sct.alt <- all_healthy_samples.hm.sct.alt %>%
 #saveRDS(all_healthy_samples.hm.sct.alt, file="/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST(Harmonized_Alt_Approach).RDS")
 ```
 
-## Alternative Harmony Approach Plots
+## Alternative Harmony approach (Not used in the final manuscript)
 
 ### Load RDS File
 
@@ -1171,8 +1182,6 @@ for(x in images){
 ```
 
 ### Top Marker Genes Heat Map
-
-<a id="s3a">
 
 ``` r
 all_healthy_samples.hm.sct.alt <- PrepSCTFindMarkers(all_healthy_samples.hm.sct.alt,assay = "SCT")
@@ -1228,8 +1237,6 @@ print(DoHeatmap(all_healthy_samples.hm.sct.alt, features = top8$gene,assay = "SC
 #dev.off()
 ```
 
-</a>
-
 ### Assign Cluster Labels
 
 ``` r
@@ -1242,8 +1249,6 @@ all_healthy_samples.hm.sct.alt[["Spatial.regions"]] <- Idents(object = all_healt
 
 ### Plot UMAP
 
-<a id="s3b">
-
 ``` r
 #pdf(width = 12,height=8,file = "UMAP_HEALTHY_SAMPLES_(HM_VER_1).pdf")
 DimPlot(all_healthy_samples.hm.sct.alt,cols = custom_colors_alt, pt.size = 3.5)
@@ -1255,11 +1260,7 @@ DimPlot(all_healthy_samples.hm.sct.alt,cols = custom_colors_alt, pt.size = 3.5)
 #dev.off(){r}
 ```
 
-</a>
-
 ### Percentage plot for different spatial regions
-
-<a id="s3c">
 
 ``` r
 Regions.df <- table(all_healthy_samples.hm.sct.alt@meta.data$Spatial.regions,all_healthy_samples.hm.sct.alt@meta.data$sample.id) %>% 
@@ -1283,5 +1284,3 @@ ggplot(Regions.df,aes(x=Sample,y=Freq,fill=Spatial_Region)) + geom_bar(stat="ide
 ``` r
 #dev.off()
 ```
-
-</a>

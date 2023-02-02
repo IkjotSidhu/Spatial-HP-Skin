@@ -11,14 +11,14 @@ output: github_document
 
 ## Table of content
 
-| FIGURE NO | DESCRIPTION                                                             | LINK                       |
-|----------|-----------------------------------|------------------------|
-| S4A       | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B and S4A]        |
-| 3B        | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B]                |
-| 3A        | NON-LESIONAL SKIN SAMPLE (ST 21 NL), and LESIONAL SKIN SAMPLE (ST 22 L) | [FIGURE 3A ]               |
-| S5        | Heatmap (After Harmony batch correction)                                | [SUPPLEMENTARY FIGURE S5 ] |
-| 3C        | Percentage composition                                                  | [FIGURE 3C]                |
-| S7B       | UMIs per cluster                                                        | [FIGURE S7B]               |
+| FIGURE NO | DESCRIPTION                                                             | LINK                      |
+|-----------|-------------------------------------------------------------------------|---------------------------|
+| S4A       | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B and S4A]       |
+| 3B        | UMAP WITH ALL SPATIAL SAMPLES (Using Harmony batch correction)          | [FIGURE 3B]               |
+| 3A        | NON-LESIONAL SKIN SAMPLE (ST 21 NL), and LESIONAL SKIN SAMPLE (ST 22 L) | [FIGURE 3A](#figure-3a-1) |
+| S5        | Heatmap (After Harmony batch correction)                                | [SUPPLEMENTARY FIGURE S5] |
+| 3C        | Percentage composition                                                  | [FIGURE 3C]               |
+| S7B       | UMIs per cluster                                                        | [FIGURE S7B]              |
 
 ## LOAD ALL PACKAGES
 
@@ -201,7 +201,7 @@ DimPlot(skin_data.hm.sct, cols=color.labels, pt.size=3.5)
 
 </a>
 
-## FIGURE 3A 
+## FIGURE 3A
 
 ### NON-LESIONAL SKIN SAMPLE (ST 21 NL)
 
@@ -211,7 +211,7 @@ DimPlot(skin_data.hm.sct, cols=color.labels, pt.size=3.5)
 SpatialDimPlot(skin_data.hm.sct,images = c("ST_21_NL_Batch_6"),cols=color.labels,pt.size.factor = 2.5)
 ```
 
-## FIGURE 3A
+## FIGURE 3A {#figure-3a-1}
 
 ### LESIONAL SKIN SAMPLE (ST 22 L)
 
@@ -245,7 +245,7 @@ top10 <- skin_data.hm.sct.markers %>%
     top_n(n = 10, wt = avg_log2FC)
 ```
 
-## SUPPLEMENTARY FIGURE S5 
+## SUPPLEMENTARY FIGURE S5
 
 ### HEATMAP showing top marker genes after Harmony batch correction
 

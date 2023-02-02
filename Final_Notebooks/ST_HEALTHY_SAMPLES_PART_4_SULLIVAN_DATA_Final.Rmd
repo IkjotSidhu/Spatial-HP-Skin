@@ -10,6 +10,11 @@ output: github_document
 ## (DOI- <https://doi.org/10.1038/s41590-021-00922-4>)
 
 ### LOAD ALL PACKAGES
+
+| FIGURE NO   | DESCRIPTION                                            |
+|-------------|--------------------------------------------------------|
+| [FIGURE 1I] | MIA ENRICHMENT FOR FAT CELLS (PRE-ADIPOCYTES AND APCs) |
+
 ```{r}
 library(Seurat)
 library(tidyverse)
@@ -20,16 +25,17 @@ library(pheatmap)
 library(enrichR)
 ```
 
-#### LOAD HELPER FUNCTIONS 
+#### LOAD HELPER FUNCTIONS
+
 ```{r}
 source("../SPATIAL_FUNCTIONS.R")
 ```
 
 #### Set Color Palette for Plotting
+
 ```{r}
 col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
 ```
-
 
 ### Loading data from Sullivan et al
 
@@ -147,6 +153,7 @@ combined_lean_samples.obj <- subset(combined_lean_samples.obj, subset = nFeature
 ```
 
 ### Normalization and Scaling data
+
 ```{r,eval=FALSE}
 combined_lean_samples.obj <- NormalizeData(combined_lean_samples.obj, normalization.method = "LogNormalize", scale.factor = 10000)
 combined_lean_samples.obj <- FindVariableFeatures(combined_lean_samples.obj, selection.method = "vst", nfeatures = 2000)
@@ -158,11 +165,13 @@ combined_lean_samples.obj <- ScaleData(combined_lean_samples.obj, features = all
 ```
 
 ### Run PCA
+
 ```{r,eval=FALSE}
 combined_lean_samples.obj <- RunPCA(combined_lean_samples.obj, features = VariableFeatures(object = combined_lean_samples.obj))
 ```
 
 ### UMAP and clustering
+
 ```{r,eval=FALSE}
 combined_lean_samples.obj <- FindNeighbors(combined_lean_samples.obj, dims = 1:20)
 combined_lean_samples.obj <- FindClusters(combined_lean_samples.obj, resolution = 0.5)
@@ -173,6 +182,7 @@ combined_lean_samples.obj <- RunUMAP(combined_lean_samples.obj, dims = 1:20)
 ```
 
 ### Save the output into RDS file
+
 ```{r,eval=FALSE}
 #saveRDS(combined_lean_samples.obj, "~/Desktop/Ikjot/RDS_Files/LEAN_SAMPLES_SCRNA.RDS")
 ```
@@ -191,6 +201,7 @@ DimPlot(combined_lean_samples.obj, label = TRUE)
 ```
 
 Mention what the first Feature Plot is for
+
 ```{r}
 FeaturePlot(combined_lean_samples.obj, features = c("CD34","DPP4","APOD","F3"))
 
@@ -201,6 +212,7 @@ FeaturePlot(combined_lean_samples.obj, features = c("VWF","CDH5"))
 ```
 
 ### Find Marker genes, plot a heatmap to label clusters by marker genes
+
 ```{r}
 # Find All Markers
 combined_lean_samples.MARKERS <- FindAllMarkers(combined_lean_samples.obj, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25,assay = "RNA")
@@ -220,6 +232,7 @@ DoHeatmap(combined_lean_samples.obj, features = top10$gene,assay = "RNA") + NoLe
 ```
 
 ### Label cell types of interest
+
 ```{r}
 Idents(combined_lean_samples.obj) <- "seurat_clusters"
 cluster.ids <- c("Preadipocytes","Preadipocytes","2","APCs","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18")
@@ -238,7 +251,7 @@ DimPlot(combined_lean_samples.obj, label = TRUE)
 
 ```{r}
 # 1. HEALTHY SKIN SAMPLES RDS FILE
-new.skin.combined <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_SKIN_SAMPLES_ST_CLUSTERS_LABELED.RDS")
+new.skin.combined <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_SKIN_SAMPLES_ST.RDS")
 
 # 2. HEALTHY SKIN SAMPLES MARKERS
 new.skin.combined.markers <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_ST_MARKERS.RDS")
@@ -262,6 +275,10 @@ sc.genes <- unique(rownames(combined_lean_samples.obj@assays$RNA@counts))
 all.genes.scrna_and_spt <- unique(intersect(sc.genes, st.genes))
 ```
 
+### FIGURE 1I
+
+### MIA ENRICHMENT FOR FAT CELLS (PRE-ADIPOCYTES AND APCs)
+
 ```{r}
 # Filter Single Cell Markers 
 filtered_single_cell_markers <- combined_lean_samples.MARKERS %>% 
@@ -283,12 +300,6 @@ MIA_results <- MIA(total_genes = length(all.genes.scrna_and_spt),
 E.data <- MIA_results %>% column_to_rownames("cluster") %>%
   dplyr::select(c("Preadipocytes", "APCs"))
 
-rownames(E.data) <- new.skin.combined@meta.data %>%
-  dplyr::select(c("seurat_clusters", "Spatial.regions")) %>%
-  arrange(seurat_clusters) %>%
-  distinct() %>%
-  dplyr::select(c("Spatial.regions")) %>%
-  pull()
 
 # Plot MIA Cell Type Enrichment
 #pdf(file = "MIA_regions_SULLIVAN_DATA.pdf",width = 10,height = 4)
@@ -349,6 +360,3 @@ for(x in cluster.labels){
   }
 }
 ```
-
-
-

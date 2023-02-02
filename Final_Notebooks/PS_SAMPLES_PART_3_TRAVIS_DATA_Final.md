@@ -1,5 +1,4 @@
-PS SAMPLES - PART 3
-================
+# PS SAMPLES - PART 3
 
 # PSORIASIS SAMPLES - CONTINUED - PART 3
 
@@ -215,8 +214,7 @@ col.pal <- RColorBrewer::brewer.pal(9, "OrRd")
 
 ### Integration with dataset 1 (Hughes et al)
 
-Importing Harmonized (Batch corrected) ST data (produced in PS Samples
-part 1 notebook).
+Importing Harmonized (Batch corrected) ST data (produced in PS Samples part 1 notebook).
 
 ``` r
 # 1. All Spatial Samples with Harmony Batch Correction
@@ -300,7 +298,7 @@ Marker_genes.TRAVIS <- FindAllMarkers(travis.psoriatic_data, max.cells.per.ident
 saveRDS(Marker_genes.TRAVIS, file="/Volumes/Extreme Pro/GITHUB-DATA/SC-RNA-DATA/TRAVIS-DATA/RDS-Files/MARKER_GENES_PSORIASIS_ONLY_TRAVIS.RDS")}
 ```
 
-### FIGURE S9B
+### FIGURE S9B {#figure-s9b}
 
 ### UMAP for (PS only) dataset-1
 
@@ -340,7 +338,7 @@ pheatmap(E.data,cluster_cols = FALSE, cluster_rows = FALSE, fontsize=15, color =
 
 ![](PS_SAMPLES_PART_3_TRAVIS_DATA_Final_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-### FIGURE 5B
+### FIGURE 5B {#figure-5b}
 
 ### MIA ENRICHMENT (IMMUNE CELLS ONLY)
 
@@ -358,7 +356,7 @@ pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=1
 #dev.off()
 ```
 
-### FIGURE S9D
+### FIGURE S9D {#figure-s9d}
 
 ### MIA ENRICHMENT (STRUCTURAL CELLS ONLY)
 
@@ -376,7 +374,7 @@ pheatmap(structure_only.E_data,cluster_cols = FALSE,cluster_rows = FALSE,fontsiz
 #dev.off()
 ```
 
-### APPROACH \#2 - SEURAT scRNA INTEGRATION
+### APPROACH #2 - SEURAT scRNA INTEGRATION
 
 ``` r
 # DO NOT RUN THIS LOCALLY
@@ -406,7 +404,7 @@ SpatialColors <- colorRampPalette(colors = rev(x = brewer.pal(n = 11, name = "Sp
 cols <- SpatialColors(n = 100)
 ```
 
-### FIGURE 5A
+### FIGURE 5A {#figure-5a}
 
 ### CELL TYPE ENRICHMENT PLOTS FOR STRUCTURAL CELLS (AS SHOWN IN FINAL FIGURE)
 
@@ -633,7 +631,7 @@ for (x in Cell_types){
 
 ![](PS_SAMPLES_PART_3_TRAVIS_DATA_Final_files/figure-gfm/unnamed-chunk-26-6.png)<!-- -->![](PS_SAMPLES_PART_3_TRAVIS_DATA_Final_files/figure-gfm/unnamed-chunk-26-7.png)<!-- -->
 
-### FIGURE 5E
+### FIGURE 5E {#figure-5e}
 
 ### B CELL SPECIFIC MARKERS - USED IN ENRICH PATHWAY ANALYSIS (PERFORMED USING ENRICHR)
 
@@ -647,7 +645,7 @@ B.CELL.MARKERS <- Marker_genes.TRAVIS %>%
 write.csv(B.CELL.MARKERS,file="B_CELL_MARKERS.csv")
 ```
 
-### FIGURE 5C
+### FIGURE 5C {#figure-5c}
 
 ### TRM (BULK RNAseq data) - MIA Analysis
 

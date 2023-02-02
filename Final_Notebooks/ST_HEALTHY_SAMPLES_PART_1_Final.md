@@ -1,22 +1,20 @@
-Healthy donors - Spatial Transcriptomics data analysis workflow
-================
+# Healthy donors - Spatial Transcriptomics data analysis workflow
 
 # ST HEALTHY SAMPLES - PART 1
 
-This notebook covers the basic to advanced analysis of ST (Spatial
-Transcriptomics) samples from healthy / normal human skin -
+This notebook covers the basic to advanced analysis of ST (Spatial Transcriptomics) samples from healthy / normal human skin -
 
-- Pre-processing
+-   Pre-processing
 
-- Quality Control
+-   Quality Control
 
-- Clustering
+-   Clustering
 
-- Dimensionality Reduction (UMAP)
+-   Dimensionality Reduction (UMAP)
 
-- Batch Correction
+-   Batch Correction
 
-- Marker Genes
+-   Marker Genes
 
 ### TABLE OF CONTENTS
 
@@ -239,8 +237,7 @@ source("../SPATIAL_FUNCTIONS.R")
 
 ### Home directory for processed files
 
-Please replace the home directory location to allow the files to be
-easily accessible
+Please replace the home directory location to allow the files to be easily accessible
 
 ### Import Healthy Samples
 
@@ -326,8 +323,7 @@ HEALTHY.Female2.s2 <- Load10X_Spatial(data.dir ="/Volumes/Extreme Pro/GITHUB-DAT
 
 (Outlier spots identified using visual inspection in loupe browser)
 
-Outlier spots here are spots that visually do not appear to be part of
-the tissue slice
+Outlier spots here are spots that visually do not appear to be part of the tissue slice
 
 ``` r
 # HEALTHY FEMALE SKIN 2
@@ -395,8 +391,7 @@ for (x in Healthy_Samples){
 
 ### Standard QC scatter plots
 
-(**UMI** / **nCount Spatial** vs. **Number of genes** / **features
-expressed**)
+(**UMI** / **nCount Spatial** vs. **Number of genes** / **features expressed**)
 
 Pre-set limits for X and Y axis - (12500,8500)
 
@@ -408,8 +403,7 @@ for (x in Healthy_Samples){
 
 ### QC filtering
 
-Remove spots with low depth (Defined by number of genes expressed per
-spot)
+Remove spots with low depth (Defined by number of genes expressed per spot)
 
 \- 200 genes minimum per spot
 
@@ -424,14 +418,11 @@ while(i <= length(Healthy_Samples)){
 
 ### Batch correction - Using Seurat Anchor integration
 
-Original vignette
-(<https://satijalab.org/seurat/articles/integration_introduction.html>)
+Original vignette (<https://satijalab.org/seurat/articles/integration_introduction.html>)
 
 Reference paper- (<https://doi.org/10.1016/j.cell.2019.05.031>)
 
-Each sample - replicate is treated as an individual batch to account for
-differences in sequencing depth between replicates and sample to sample
-heterogeneity in human patient samples.
+Each sample - replicate is treated as an individual batch to account for differences in sequencing depth between replicates and sample to sample heterogeneity in human patient samples.
 
 ``` r
 new.skin.combined <- st_combine(Healthy_Samples, ndim = 20, res = 0.6)
@@ -444,8 +435,7 @@ saveRDS(new.skin.combined, "/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DAT
 
 ### Load the pre-processed data
 
-(The RDS was processed using the same parameters that have been defined
-above)
+(The RDS was processed using the same parameters that have been defined above)
 
 ``` r
 new.skin.combined <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/HEALTHY-DATA/RDS-Files/HEALTHY_SKIN_SAMPLES_ST.RDS")

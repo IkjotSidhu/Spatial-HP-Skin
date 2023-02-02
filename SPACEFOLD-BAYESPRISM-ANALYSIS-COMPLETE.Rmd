@@ -27,12 +27,13 @@ References and links-
 -   Github page and documentation
     (<https://github.com/dpeerlab/SpaceFold_paper>)
 
-| FIGURE NO / LINK | DESCRIPTION                                                    |
-|--------------------|-------------------------------|
-| [FIGURE 7A - 1]  | Space-fold projection - Mild disease (non-lesional)            |
-| [FIGURE 7A - 2]  | Space-fold projection - Mild disease (lesional)                |
-| [FIGURE 7B - 1]  | Space-fold projection - Moderate-severe disease (non-lesional) |
-| [FIGURE 7B - 2]  | Space-fold projection - Moderate-severe disease (lesional)     |
+| FIGURE NO / LINK                 | DESCRIPTION                                                               |
+|----------------------|--------------------------------------------------|
+| [FIGURE 5D - HEALTHY SKIN]       | Space-fold projection - healthy                                           |
+| [FIGURE 5D - NON -LESIONAL SKIN] | Space-fold projection - non-lesional                                      |
+| [FIGURE 5D - LESIONAL SKIN]      | Space-fold projection - lesional                                          |
+| [FIGURE 7A]                      | Space-fold projection - Mild disease (non-lesional & lesional)            |
+| [FIGURE 7B]                      | Space-fold projection - Moderate-severe disease (non-lesional & lesional) |
 
 ```{r}
 library(Seurat)
@@ -251,6 +252,8 @@ rownames(healthy_skin.st.ted$para$X) <- meta$barcode
 healthy_skin.st.ted <- add.meta(bp.obj= healthy_skin.st.ted, meta =meta)
 ```
 
+### FIGURE 5D - HEALTHY SKIN
+
 ```{r}
 #compute Znk (fraction of reads in each cell type)
 healthy_skin.st.ted <- compute.Znk(healthy_skin.st.ted)
@@ -269,7 +272,7 @@ healthy_skin.st.ted <- phate.bp (healthy_skin.st.ted, if.invert=FALSE)
 plot.beeswarm.no.pdf(healthy_skin.st.ted, pdf.prefix="HEALTHY_SKIN_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = healthy.order)
 
 #plot cell type distribution along the spacefold axis
-plot.beeswarm.no.pdf(healthy_skin.st.ted, pdf.prefix="HEALTHY_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = healthy.order)
+#plot.beeswarm.no.pdf(healthy_skin.st.ted, pdf.prefix="HEALTHY_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = healthy.order)
 ```
 
 MATCH THE BARCODES
@@ -283,6 +286,8 @@ meta <- as.data.frame(ps_lesional_skin.st@meta.data) %>% rownames_to_column("bar
 rownames(ps.lesional.ted$para$X) <- meta$barcode
 ps.lesional.ted <- add.meta(bp.obj= ps.lesional.ted, meta =meta)
 ```
+
+### FIGURE 5D - LESIONAL SKIN
 
 ```{r}
 #compute Znk (fraction of reads in each cell type)
@@ -299,7 +304,7 @@ ps.lesional.ted <- compute.background.level (ps.lesional.ted, which.theta='final
 ps.lesional.ted <- phate.bp (ps.lesional.ted, if.invert=FALSE)
 
 #plot cell type distribution along the spacefold axis
-plot.beeswarm.no.pdf(ps.lesional.ted, pdf.prefix="PS_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
+#plot.beeswarm.no.pdf(ps.lesional.ted, pdf.prefix="PS_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
 
 #plot cell type distribution along the spacefold axis
 plot.beeswarm.no.pdf(ps.lesional.ted, pdf.prefix="PS_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
@@ -318,6 +323,8 @@ rownames(ps.non_lesional.ted$para$X) <- meta$barcode
 ps.non_lesional.ted <- add.meta(bp.obj= ps.non_lesional.ted, meta =meta)
 ```
 
+### FIGURE 5D - NON -LESIONAL SKIN
+
 ```{r}
 #compute Znk (fraction of reads in each cell type)
 ps.non_lesional.ted <- compute.Znk(ps.non_lesional.ted)
@@ -333,7 +340,7 @@ ps.non_lesional.ted <- compute.background.level (ps.non_lesional.ted, which.thet
 ps.non_lesional.ted <- phate.bp (ps.non_lesional.ted, if.invert=FALSE,renorm.to.one = TRUE)
 
 #plot cell type distribution along the spacefold axis
-plot.beeswarm.no.pdf(ps.non_lesional.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = ps.order)
+#plot.beeswarm.no.pdf(ps.non_lesional.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = ps.order)
 
 #plot cell type distribution along the spacefold axis
 plot.beeswarm.no.pdf(ps.non_lesional.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
@@ -358,7 +365,9 @@ rownames(ps_lesional_skin.st_mild.ted$para$X) <- meta$barcode
 ps_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_lesional_skin.st_mild.ted, meta =meta)
 ```
 
-#### **FIGURE 7A - 2**
+## **FIGURE 7A** 
+
+#### **FIGURE 7A -** LESIONAL & MILD
 
 #### SPACE-FOLD PROJECTION (LESIONAL SKIN - MILD GROUP)
 
@@ -384,7 +393,47 @@ plot.beeswarm.no.pdf(ps_lesional_skin.st_mild.ted, pdf.prefix="PS_LESIONAL_SKIN_
 
 ```
 
-### **FIGURE 7B - 2**
+#### **FIGURE 7A -** NON-LESIONAL & MILD
+
+#### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MILD GROUP)
+
+LOAD NON-LESIONAL SKIN DATA - GROUPED BY SEVERITY
+
+```{r}
+ps_non_lesional_skin.st_mild.ted <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/BAYESPRISM-DATA/BAYES_PRISM_OUTPUT/Archive/ps_non_lesional_skin.st_mild.ted.RDS")
+ps_non_lesional_skin.st_severe.ted <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/BAYESPRISM-DATA/BAYES_PRISM_OUTPUT/Archive/ps_non_lesional.st_severe.ted.RDS")
+```
+
+```{r}
+meta <- as.data.frame(ps_non_lesional_skin.st_mild@meta.data) %>% rownames_to_column("barcode")
+rownames(ps_non_lesional_skin.st_mild.ted$para$X) <- meta$barcode
+ps_non_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_non_lesional_skin.st_mild.ted, meta =meta)
+```
+
+```{r}
+#compute Znk (fraction of reads in each cell type)
+ps_non_lesional_skin.st_mild.ted <- compute.Znk(ps_non_lesional_skin.st_mild.ted)
+
+#normalize by Znk
+ps_non_lesional_skin.st_mild.ted <- norm.by.sf(ps_non_lesional_skin.st_mild.ted)
+
+#determine background level, using final theta
+ps_non_lesional_skin.st_mild.ted <- compute.background.level (ps_non_lesional_skin.st_mild.ted, which.theta='final')
+
+#run phate
+# specify anchorCellTypes to select cell types (if you need to held out a group of cell types) 
+ps_non_lesional_skin.st_mild.ted <- phate.bp (ps_non_lesional_skin.st_mild.ted, if.invert=FALSE)
+
+#plot cell type distribution along the spacefold axis
+#plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_MILD_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = ps.order)
+
+#plot cell type distribution along the spacefold axis
+plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_MILD_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
+```
+
+## **FIGURE 7B**
+
+### **FIGURE 7B -** LESIONAL & MODERATE-SEVERE
 
 #### SPACE-FOLD PROJECTION (LESIONAL SKIN - MODERATE-SEVERE GROUP)
 
@@ -419,47 +468,9 @@ ps_lesional_skin.st_severe.ted <- phate.bp (ps_lesional_skin.st_severe.ted, if.i
 plot.beeswarm.no.pdf(ps_lesional_skin.st_severe.ted, pdf.prefix="PS_LESIONAL_SKIN_SEVERE_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
 ```
 
-LOAD NON-LESIONAL SKIN DATA - GROUPED BY SEVERITY
+#### **FIGURE 7B -** NON-LESIONAL & MODERATE-SEVERE
 
-```{r}
-ps_non_lesional_skin.st_mild.ted <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/BAYESPRISM-DATA/BAYES_PRISM_OUTPUT/Archive/ps_non_lesional_skin.st_mild.ted.RDS")
-ps_non_lesional_skin.st_severe.ted <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/BAYESPRISM-DATA/BAYES_PRISM_OUTPUT/Archive/ps_non_lesional.st_severe.ted.RDS")
-```
-
-```{r}
-meta <- as.data.frame(ps_non_lesional_skin.st_mild@meta.data) %>% rownames_to_column("barcode")
-rownames(ps_non_lesional_skin.st_mild.ted$para$X) <- meta$barcode
-ps_non_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_non_lesional_skin.st_mild.ted, meta =meta)
-```
-
-#### **FIGURE 7A - 1**
-
-#### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MILD GROUP)
-
-```{r}
-#compute Znk (fraction of reads in each cell type)
-ps_non_lesional_skin.st_mild.ted <- compute.Znk(ps_non_lesional_skin.st_mild.ted)
-
-#normalize by Znk
-ps_non_lesional_skin.st_mild.ted <- norm.by.sf(ps_non_lesional_skin.st_mild.ted)
-
-#determine background level, using final theta
-ps_non_lesional_skin.st_mild.ted <- compute.background.level (ps_non_lesional_skin.st_mild.ted, which.theta='final')
-
-#run phate
-# specify anchorCellTypes to select cell types (if you need to held out a group of cell types) 
-ps_non_lesional_skin.st_mild.ted <- phate.bp (ps_non_lesional_skin.st_mild.ted, if.invert=FALSE)
-
-#plot cell type distribution along the spacefold axis
-#plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_MILD_SPACEFOLD_OUTPUT(0.95_cutoff)",q.cut = 0.95,cell.type.order = ps.order)
-
-#plot cell type distribution along the spacefold axis
-plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESIONAL_SKIN_MILD_SPACEFOLD_OUTPUT(0.90_cutoff)",q.cut = 0.90,cell.type.order = ps.order)
-```
-
-### **FIGURE 7B - 1**
-
-#### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MODERATE-SEVERE GROUP)
+#### SPACE-FOLD PROJECTION
 
 ```{r}
 meta <- as.data.frame(ps_non_lesional.st_severe@meta.data) %>% rownames_to_column("barcode")

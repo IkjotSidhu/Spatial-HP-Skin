@@ -12,7 +12,7 @@ output: github_document
 ### (DOI - <https://doi.org/10.1016/j.immuni.2020.09.015>).
 
 | LINK / FIG NO | DESCRIPTION                                                                                               |
-|-----------------|--------------------------------------------------|
+|---------------|-----------------------------------------------------------------------------------------------------------|
 | [FIGURE 5A]   | Spatial plots for cell type enrichment using (PS only) data-set 1 (Hughes et al.) - Structural cell types |
 | [FIGURE 5B]   | MIA for (PS only) dataset 1 - Immune cell types                                                           |
 | [FIGURE 5C]   | MIA for TRM (Bulk RNAseq dataset)                                                                         |

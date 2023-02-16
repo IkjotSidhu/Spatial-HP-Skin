@@ -212,9 +212,12 @@ show_col(custom_colors)
 ### Finding marker genes for batch corrected healthy samples + plotting for top 8 marker genes per cluster heat-map
 
 ```{r}
+
 # Find top 8 marker genes for each cluster for heat map
 new.skin.combined <- PrepSCTFindMarkers(new.skin.combined,assay = "SCT")
+
 Idents(new.skin.combined) <- "seurat_clusters"
+
 new.skin.combined.markers <- FindAllMarkers(new.skin.combined, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, assay = "SCT")
 
 DefaultAssay(new.skin.combined) <- "SCT"

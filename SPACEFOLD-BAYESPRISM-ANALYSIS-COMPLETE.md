@@ -1,5 +1,4 @@
-BAYESPRISM + SPACEFOLD
-================
+# BAYESPRISM + SPACEFOLD
 
 ## BAYESPRISM + SPACEFOLD -
 
@@ -9,24 +8,23 @@ References and links-
 
 ### **BayesPrism**
 
-- Original paper -(DOI- <https://doi.org/10.1038/s43018-022-00356-3>),
+-   Original paper -(DOI- <https://doi.org/10.1038/s43018-022-00356-3>),
 
-- Github page and documentation
-  (<https://github.com/Danko-Lab/BayesPrism>)
+-   Github page and documentation (<https://github.com/Danko-Lab/BayesPrism>)
 
 ### **SpaceFold**
 
-- Original paper - (DOI- <https://doi.org/10.1016/j.stem.2022.05.007>),
+-   Original paper - (DOI- <https://doi.org/10.1016/j.stem.2022.05.007>),
 
-- Github page and documentation
-  (<https://github.com/dpeerlab/SpaceFold_paper>)
+-   Github page and documentation (<https://github.com/dpeerlab/SpaceFold_paper>)
 
-| FIGURE NO / LINK  | DESCRIPTION                                                    |
-|-------------------|----------------------------------------------------------------|
-| \[FIGURE 7A - 1\] | Space-fold projection - Mild disease (non-lesional)            |
-| \[FIGURE 7A - 2\] | Space-fold projection - Mild disease (lesional)                |
-| \[FIGURE 7B - 1\] | Space-fold projection - Moderate-severe disease (non-lesional) |
-| \[FIGURE 7B - 2\] | Space-fold projection - Moderate-severe disease (lesional)     |
+| FIGURE NO / LINK                 | DESCRIPTION                                                               |
+|----------------------|------------------------------------------------|
+| [FIGURE 5D - HEALTHY SKIN]       | Space-fold projection - healthy                                           |
+| [FIGURE 5D - NON -LESIONAL SKIN] | Space-fold projection - non-lesional                                      |
+| [FIGURE 5D - LESIONAL SKIN]      | Space-fold projection - lesional                                          |
+| [FIGURE 7A]                      | Space-fold projection - Mild disease (non-lesional & lesional)            |
+| [FIGURE 7B]                      | Space-fold projection - Moderate-severe disease (non-lesional & lesional) |
 
 ``` r
 library(Seurat)
@@ -92,8 +90,7 @@ library(ggsci)
 skin_data.hm.sct <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/ALL_SPATIAL_SAMPLES(HM_BATCH_CORRECTED).RDS")
 ```
 
-*Import processed (Seurat object) single cell RNA (scRNA) data from
-Hughes et al (Dataset 1)*
+*Import processed (Seurat object) single cell RNA (scRNA) data from Hughes et al (Dataset 1)*
 
 Psoriatic skin data
 
@@ -151,11 +148,9 @@ Split the Seurat ST data into three main groups-
 
 3.  Healthy / Normal skin
 
-Following that, we run BayesPrism pipeline on all three groups,
-independently.
+Following that, we run BayesPrism pipeline on all three groups, independently.
 
-<u>(NOTE: This process requires a long run time and high memory
-usage)</u>
+<u>(NOTE: This process requires a long run time and high memory usage)</u>
 
 ``` r
 ps_lesional_skin.st <- subset(skin_data.hm.sct,DISEASE_STATUS %in% c("Lesional"))
@@ -189,10 +184,7 @@ healthy_skin.st.ted <- run_bayes_prism(healthy_skin.st.counts,travis_normal_skin
 
 ## PS SAMPLES - grouped by severity ratings
 
-Split the Seurat ST data into different groups on the basis of disease
-severity i.e. PASI score and disease status . Mild group samples have a
-PASI score\<12 and Moderate-severe group samples have a PASI score \>=
-12.
+Split the Seurat ST data into different groups on the basis of disease severity i.e. PASI score and disease status . Mild group samples have a PASI score\<12 and Moderate-severe group samples have a PASI score \>= 12.
 
 The following four groups were created:-
 
@@ -213,7 +205,7 @@ ps_non_lesional_skin.st_mild <- subset(skin_data.hm.sct,DISEASE_STATUS %in% c("N
 ps_non_lesional.st_severe <- subset(skin_data.hm.sct,DISEASE_STATUS %in% c("Non-Lesional")) %>% subset(PASI>=12)
 ```
 
-\##Run BayesPrism on each group -
+##Run BayesPrism on each group -
 
 ### MILD LESIONAL SAMPLES
 
@@ -318,6 +310,10 @@ immune.cells <- c("Langerhans","Myeloid","T","B")
 healthy.order <- c("KC","HairFollicle","Melanocyte","VSMC","Lymphatic","Endo","Fibro","Langerhans","Myeloid","Mast","T")
 ps.order <- c("KC","HairFollicle","Melanocyte","VSMC","Lymphatic","Endo","Fibro","Langerhans","Myeloid","Mast","T","B")
 ```
+
+### FIGURE 5D - HEALTHY SKIN {data-link="FIGURE 5D - HEALTHY SKIN"}
+
+(0.9 quantile used in the final manuscript)
 
 ``` r
 healthy_skin.st.ted$para$feature <- healthy_skin.st.ted$para$X
@@ -470,6 +466,10 @@ plot.beeswarm.no.pdf(healthy_skin.st.ted, pdf.prefix="HEALTHY_SKIN_SPACEFOLD_OUT
 ```
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
+
+### FIGURE 5D - LESIONAL SKIN {data-link="FIGURE 5D - LESIONAL SKIN"}
+
+(0.9 quantile used in the final manuscript)
 
 MATCH THE BARCODES
 
@@ -644,6 +644,10 @@ plot.beeswarm.no.pdf(ps.lesional.ted, pdf.prefix="PS_LESIONAL_SKIN_SPACEFOLD_OUT
 ```
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-25-3.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-25-4.png)<!-- -->
+
+### FIGURE 5D - NON -LESIONAL SKIN {data-link="FIGURE 5D - NON -LESIONAL SKIN"}
+
+(0.9 quantile used in the final manuscript)
 
 ``` r
 ps.non_lesional.ted$para$feature <- ps.non_lesional.ted$para$X
@@ -1188,7 +1192,7 @@ rownames(ps_non_lesional_skin.st_mild.ted$para$X) <- meta$barcode
 ps_non_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_non_lesional_skin.st_mild.ted, meta =meta)
 ```
 
-#### **FIGURE 7A - 1**
+#### **FIGURE 7A**
 
 #### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MILD GROUP)
 
@@ -1350,7 +1354,7 @@ plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESION
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-38-2.png)<!-- -->
 
-### **FIGURE 7B - 1**
+### **FIGURE 7B**
 
 #### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MODERATE-SEVERE GROUP)
 

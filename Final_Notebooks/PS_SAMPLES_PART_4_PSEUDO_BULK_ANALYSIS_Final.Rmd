@@ -8,7 +8,7 @@ output: github_document
 ### *DIFFERENTIAL TESTING BETWEEN CONDITIONS - LESIONAL, NON-LESIONAL AND HEALTHY*
 
 | FIGURE NO | DESCRIPTION                                                | LINK                                                                                |
-|-----------|------------------------------------------------------------|-------------------------------------------------------------------------------------|
+|--------------|------------------------|----------------------------------|
 | 6A        | Hierarchical clustering based heatmap for all samples      | [FIGURE 6A]                                                                         |
 | 6B        | PCA plot for all samples - grouped by PS group             | [FIGURE 6B / 6C](#figure-6b-6c)                                                     |
 | 6C        | PCA plot for all samples - grouped by Disease severity     | [FIGURE 6B / 6C](#figure-6b-6c)                                                     |
@@ -353,9 +353,5 @@ for(y in images){
   print(SpatialFeaturePlot(skin_data.hm.sct, features = c("SERPINB4"), pt.size.factor = 2.5, crop = TRUE,images = y))
   #dev.off()
 }
-
-```
-
-```{r}
 
 ```

@@ -1,5 +1,4 @@
-Niche Net LR Interactions
-================
+# Niche Net LR Interactions
 
 ## LIGAND-RECEPTOR ANALYSIS USING NICHE-NET
 
@@ -55,12 +54,11 @@ library(tidyverse)
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
 
-Please check the original vignette from NichNet Official Documentation
-for more information -
+Please check the original vignette from NichNet Official Documentation for more information -
 
 (<https://github.com/saeyslab/nichenetr/blob/master/vignettes/differential_nichenet.md>)
 
-\#1. Load Seurat object and the relevant reference data for NicheNet
+#1. Load Seurat object and the relevant reference data for NicheNet
 
 ``` r
 skin_data.hm.sct <- readRDS("/Volumes/Extreme Pro/GITHUB-DATA/ST-DATA/PSORIASIS-DATA/RDS-Files/ALL_SPATIAL_SAMPLES(HM_BATCH_CORRECTED).RDS")
@@ -92,7 +90,7 @@ niches = list(
   )
 ```
 
-\#2. Calculate differential expression between the niches
+#2. Calculate differential expression between the niches
 
 ``` r
 assay_oi = "Spatial" # other possibilities: RNA,...
@@ -156,11 +154,9 @@ include_spatial_info_sender = FALSE # if not spatial info to include: put this t
 include_spatial_info_receiver = FALSE # if spatial info to include: put this to true 
 ```
 
-\#3. Optional: Calculate differential expression between the different
-spatial regions
+#3. Optional: Calculate differential expression between the different spatial regions
 
-(Ignored here as we are only using spatial transcriptomics (10X
-genomics, Visium assay))
+(Ignored here as we are only using spatial transcriptomics (10X genomics, Visium assay))
 
 ``` r
 # NOT USABLE SINCE WE ONLY HAVE ST DATASET AND NOT THE CORRESPONDING SC RNA DATASET FROM THE SAME SAMPLES
@@ -213,7 +209,7 @@ if(include_spatial_info_receiver == TRUE){
 }
 ```
 
-\#4. Calculate ligand activities and infer active ligand-target links
+#4. Calculate ligand activities and infer active ligand-target links
 
 ``` r
 lfc_cutoff = 0.15 # recommended for 10x as min_lfc cutoff. 
@@ -315,9 +311,7 @@ ligand_activities_targets = get_ligand_activities_targets(niche_geneset_list = n
     ## Warning in cor(prediction, response, method = "s"): the standard deviation is
     ## zero
 
-\#5. Calculate (scaled) expression of ligands, receptors and targets
-across cell types of interest (log expression values and expression
-fractions)
+#5. Calculate (scaled) expression of ligands, receptors and targets across cell types of interest (log expression values and expression fractions)
 
 ``` r
 features_oi = union(lr_network$ligand, lr_network$receptor) %>% union(ligand_activities_targets$target) %>% setdiff(NA)
@@ -338,7 +332,7 @@ exprs_tbl_ligand = exprs_tbl_ligand %>%  mutate(scaled_ligand_expression_scaled 
 exprs_tbl_receptor = exprs_tbl_receptor %>% mutate(scaled_receptor_expression_scaled = scale_quantile_adapted(receptor_expression_scaled))  %>% mutate(receptor_fraction_adapted = receptor_fraction) %>% mutate_cond(receptor_fraction >= expression_pct, receptor_fraction_adapted = expression_pct)  %>% mutate(scaled_receptor_fraction_adapted = scale_quantile_adapted(receptor_fraction_adapted))
 ```
 
-\#6. Expression fraction and receptor
+#6. Expression fraction and receptor
 
 ``` r
 exprs_sender_receiver = lr_network %>% 
@@ -628,7 +622,7 @@ circos_output = make_circos_lr(prioritized_tbl_oi, colors_sender, colors_receive
 #dev.off()
 ```
 
-### Cluster 4 - Epidermis (Receptor)
+### Cluster 4 - Epidermis (Receptor) {#cluster-4---epidermis-receptor}
 
 Selected pairs of ligands-receptors from top 50 results.
 
@@ -664,7 +658,7 @@ circos_output = make_circos_lr(prioritized_tbl_oi, colors_sender, colors_receive
 #dev.off()
 ```
 
-### Cluster 10 - Suprabasal keratinocytes (Receptor)
+### Cluster 10 - Suprabasal keratinocytes (Receptor) {#cluster-10---suprabasal-keratinocytes-receptor}
 
 Selected pairs of ligands-receptors from top 50 results.
 
@@ -736,7 +730,7 @@ circos_output = make_circos_lr(prioritized_tbl_oi, colors_sender, colors_receive
 #dev.off()
 ```
 
-### Cluster 7 - Epidermis (Receptor)
+### Cluster 7 - Epidermis (Receptor) {#cluster-7---epidermis-receptor}
 
 ``` r
 receiver_oi = "7 Epidermis" 

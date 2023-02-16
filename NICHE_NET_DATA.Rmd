@@ -6,7 +6,7 @@ output: github_document
 ## LIGAND-RECEPTOR ANALYSIS USING NICHE-NET
 
 | FIGURE NO                                                                                           | DESCRIPTION                                                                         |
-|---------------------------------------|---------------------------------|
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | [Cluster 4 - Epidermis (Receptor)](#cluster-4---epidermis-receptor)                                 | Circos plot visualization - cluster 4 receptor with clusters 7, 3 and 10 as ligand. |
 | [Cluster 7 - Epidermis (Receptor)](#cluster-7---epidermis-receptor)                                 | Circos plot visualization - cluster 7 receptor with clusters 10, 3 and 4 as ligand. |
 | [Cluster 10 - Suprabasal keratinocytes (Receptor)](#cluster-10---suprabasal-keratinocytes-receptor) | Circos plot visualization - cluster 10 receptor with clusters 7, 3 and 4 as ligand. |

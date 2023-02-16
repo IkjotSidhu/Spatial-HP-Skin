@@ -28,7 +28,7 @@ References and links-
     (<https://github.com/dpeerlab/SpaceFold_paper>)
 
 | FIGURE NO / LINK                 | DESCRIPTION                                                               |
-|----------------------|--------------------------------------------------|
+|-----------------------|-------------------------------------------------|
 | [FIGURE 5D - HEALTHY SKIN]       | Space-fold projection - healthy                                           |
 | [FIGURE 5D - NON -LESIONAL SKIN] | Space-fold projection - non-lesional                                      |
 | [FIGURE 5D - LESIONAL SKIN]      | Space-fold projection - lesional                                          |
@@ -365,7 +365,7 @@ rownames(ps_lesional_skin.st_mild.ted$para$X) <- meta$barcode
 ps_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_lesional_skin.st_mild.ted, meta =meta)
 ```
 
-## **FIGURE 7A** 
+## **FIGURE 7A**
 
 #### **FIGURE 7A -** LESIONAL & MILD
 

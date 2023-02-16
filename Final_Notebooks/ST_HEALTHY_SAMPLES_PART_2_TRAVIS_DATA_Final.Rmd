@@ -172,9 +172,9 @@ pheatmap(E.data, cluster_cols = FALSE, cluster_rows = FALSE, fontsize=15, color 
 ```{r}
 immune_only.E.data <- E.data[,c("T cell-1","T cell-2","T cell-3","Myeloid-1","Langerhans","Mast-1","Mast-2")]
 
-#pdf(file = "MIA_regions_IMMUNE_CELLS.pdf",width = 10,height = 4)
+pdf(file = "MIA_regions_IMMUNE_CELLS(HEALTHY-SAMPLES_ONLY).pdf",width = 10,height = 4)
 pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
-#dev.off()
+dev.off()
 ```
 
 </a>
@@ -184,9 +184,9 @@ pheatmap(immune_only.E.data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=1
 ```{r}
 structure_only.E_data <- E.data[,c("Fibroblast-1","Fibroblast-2","Fibroblast-4","Fibroblast-5","HairFollicle","Keratinocyte-2","Keratinocyte-3","Keratinocyte-5","Keratinocyte-6","Keratinocyte-8","Sebocyte","Venule-1","Venule-2","Venule-3","Venule-4","VSMC-1")]
 
-#pdf(file = "MIA_regions_STRUCTURAL_CELLS.pdf",width = 10,height = 4)
+pdf(file = "MIA_regions_STRUCTURAL_CELLS(HEALTHY-SAMPLES_ONLY).pdf",width = 10,height = 4)
 pheatmap(structure_only.E_data,cluster_cols = FALSE,cluster_rows = FALSE,fontsize=15,color = col.pal)
-#dev.off()
+dev.off()
 ```
 
 ### Calculate enrichment for each cell type (Using Seurat Anchor Integration)

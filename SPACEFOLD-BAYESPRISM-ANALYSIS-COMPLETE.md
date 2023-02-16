@@ -20,11 +20,11 @@ References and links-
 
 | FIGURE NO / LINK                 | DESCRIPTION                                                               |
 |----------------------|------------------------------------------------|
-| [FIGURE 5D - HEALTHY SKIN]       | Space-fold projection - healthy                                           |
-| [FIGURE 5D - NON -LESIONAL SKIN] | Space-fold projection - non-lesional                                      |
-| [FIGURE 5D - LESIONAL SKIN]      | Space-fold projection - lesional                                          |
-| [FIGURE 7A]                      | Space-fold projection - Mild disease (non-lesional & lesional)            |
-| [FIGURE 7B]                      | Space-fold projection - Moderate-severe disease (non-lesional & lesional) |
+| [FIGURE 5D HEALTHY SKIN](#figure-5d-healthy-skin)       | Space-fold projection - healthy                                           |
+| [FIGURE 5D NON LESIONAL SKIN](#figure-5d-non-lesional-skin)| Space-fold projection - non-lesional                                      |
+| [FIGURE 5D LESIONAL SKIN](#figure-5d-lesional-skin)      | Space-fold projection - lesional                                          |
+| [FIGURE 7A](#figure-7a)                      | Space-fold projection - Mild disease (non-lesional & lesional)            |
+| [FIGURE 7B](#figure-7b)                     | Space-fold projection - Moderate-severe disease (non-lesional & lesional) |
 
 ``` r
 library(Seurat)
@@ -311,7 +311,7 @@ healthy.order <- c("KC","HairFollicle","Melanocyte","VSMC","Lymphatic","Endo","F
 ps.order <- c("KC","HairFollicle","Melanocyte","VSMC","Lymphatic","Endo","Fibro","Langerhans","Myeloid","Mast","T","B")
 ```
 
-### FIGURE 5D - HEALTHY SKIN {data-link="FIGURE 5D - HEALTHY SKIN"}
+### FIGURE 5D HEALTHY SKIN 
 
 (0.9 quantile used in the final manuscript)
 
@@ -467,7 +467,7 @@ plot.beeswarm.no.pdf(healthy_skin.st.ted, pdf.prefix="HEALTHY_SKIN_SPACEFOLD_OUT
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-22-3.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-22-4.png)<!-- -->
 
-### FIGURE 5D - LESIONAL SKIN {data-link="FIGURE 5D - LESIONAL SKIN"}
+### FIGURE 5D LESIONAL SKIN
 
 (0.9 quantile used in the final manuscript)
 
@@ -645,7 +645,7 @@ plot.beeswarm.no.pdf(ps.lesional.ted, pdf.prefix="PS_LESIONAL_SKIN_SPACEFOLD_OUT
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-25-3.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-25-4.png)<!-- -->
 
-### FIGURE 5D - NON -LESIONAL SKIN {data-link="FIGURE 5D - NON -LESIONAL SKIN"}
+### FIGURE 5D NON LESIONAL SKIN
 
 (0.9 quantile used in the final manuscript)
 
@@ -842,7 +842,7 @@ rownames(ps_lesional_skin.st_mild.ted$para$X) <- meta$barcode
 ps_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_lesional_skin.st_mild.ted, meta =meta)
 ```
 
-#### **FIGURE 7A - 2**
+#### FIGURE 7A - 2
 
 #### SPACE-FOLD PROJECTION (LESIONAL SKIN - MILD GROUP)
 
@@ -1192,7 +1192,7 @@ rownames(ps_non_lesional_skin.st_mild.ted$para$X) <- meta$barcode
 ps_non_lesional_skin.st_mild.ted <- add.meta(bp.obj= ps_non_lesional_skin.st_mild.ted, meta =meta)
 ```
 
-#### **FIGURE 7A**
+#### FIGURE 7A
 
 #### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MILD GROUP)
 
@@ -1354,7 +1354,7 @@ plot.beeswarm.no.pdf(ps_non_lesional_skin.st_mild.ted, pdf.prefix="PS_NON_LESION
 
 ![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->![](SPACEFOLD-BAYESPRISM-ANALYSIS-COMPLETE_files/figure-gfm/unnamed-chunk-38-2.png)<!-- -->
 
-### **FIGURE 7B**
+### FIGURE 7B
 
 #### SPACE-FOLD PROJECTION (NON-LESIONAL SKIN - MODERATE-SEVERE GROUP)
 

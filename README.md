@@ -37,6 +37,7 @@ Please make sure to install all of the dependencies prior to running the code. T
 -   [ggsci](https://nanx.me/ggsci/) (For color palettes only)
 
 ## ZENODO REPOSITORY
+All of the processed data (Including RDS files) can be found at (https://doi.org/10.5281/zenodo.7562864). 
 
 ## CODE AND REPOSITORY NAVIGATION
 

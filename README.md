@@ -41,11 +41,10 @@ All of the processed data (Including RDS files) can be found at (https://doi.org
 
 ## CODE AND REPOSITORY NAVIGATION
 
-The code is organised into several R notebooks with each notebook covering different parts of the analysis. The figure numbers and references are found within each notebook and a table content will also be added to link each figure to different parts of code for ease of navigation.
+The code is organized into several R notebooks with each notebook covering different parts of the analysis. The figure numbers and references are found within each notebook and a table content will also be added to link each figure to different parts of the code for ease of navigation.
 
-The notebooks will also require you to download the data from the linked Zenodo repository in order to reproduce all of the respective figures.
+The notebooks will also require you to download the data from the linked Zenodo repository to reproduce all of the respective figures.
 
-Each notebook link will take you to the notebook with necessary code, please select the figure number in the table of contents found on top of the notebook to .
 
 ### FIGURE 1
 

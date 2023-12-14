@@ -18,7 +18,7 @@ All of the raw files linked to this project can be found under GEO Accession num
 
 Please make sure to install all of the dependencies prior to running the code. The following dependencies are essential:-
 
--   [Seurat](https://satijalab.org/seurat/index.html) (Recommended V4 and above)
+-   [Seurat](https://satijalab.org/seurat/index.html) (Recommended V4)
 
 -   [Tidyverse](https://www.tidyverse.org/)
 
